@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { DUTY_LABELS, DUTY_SHORT } from "@/lib/constants";
+import { DUTY_LABELS } from "@/lib/constants";
 import { requireUser } from "@/lib/auth";
 import { formatKoreanDate, toDateKey } from "@/lib/utils";
 import type { DutyShift, Notice } from "@/lib/types";
@@ -46,14 +46,14 @@ export default async function HomePage() {
             캘린더 보기
           </Link>
         </div>
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="divide-y divide-[var(--line)] rounded-2xl border border-[var(--line)] bg-white">
           {(["staff", "trainee", "nurse"] as const).map((key) => (
             <div
               key={key}
-              className="rounded-2xl border border-[var(--line)] bg-white p-4"
+              className="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-baseline sm:gap-4"
             >
-              <p className="text-xs text-stone-500">{DUTY_LABELS[key]}</p>
-              <div className="mt-2 space-y-1">
+              <p className="w-36 shrink-0 text-sm text-stone-500">{DUTY_LABELS[key]}</p>
+              <div className="min-w-0 flex-1 space-y-0.5">
                 {grouped[key].length === 0 ? (
                   <p className="text-sm text-stone-400">미정</p>
                 ) : (
@@ -69,7 +69,6 @@ export default async function HomePage() {
                   ))
                 )}
               </div>
-              <p className="mt-3 text-[11px] text-stone-400">{DUTY_SHORT[key]} 전용 표</p>
             </div>
           ))}
         </div>
