@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { DeleteButton } from "@/components/delete-button";
+import { SearchInput } from "@/components/search-input";
 import { addProcedure, deleteProcedure } from "@/lib/actions/knowledge";
 import { requireUser } from "@/lib/auth";
 import type { Procedure } from "@/lib/types";
@@ -7,13 +8,16 @@ import type { Procedure } from "@/lib/types";
 export default async function ProceduresPage({
   searchParams,
 }: {
-  searchParams: Promise<{ cat?: string }>;
+  searchParams: Promise<{ cat?: string; q?: string }>;
 }) {
-  const { cat } = await searchParams;
+  const { cat, q } = await searchParams;
   const { supabase } = await requireUser();
   let query = supabase.from("procedures").select("*").order("sort_order");
   if (cat === "술기" || cat === "수술") {
     query = query.eq("category", cat);
+  }
+  if (q) {
+    query = (query as any).or(`title.ilike.%${q}%,indication.ilike.%${q}%`);
   }
   const { data } = await query;
 
@@ -42,6 +46,9 @@ export default async function ProceduresPage({
             </Link>
           ))}
         </div>
+        <div className="mt-3">
+          <SearchInput placeholder="제목·적응증 검색" />
+        </div>
       </header>
 
       <div className="grid gap-3">
@@ -59,7 +66,7 @@ export default async function ProceduresPage({
             </Link>
             <div className="flex shrink-0 gap-2 pt-1">
               <Link href={`/procedures/${p.id}`} className="text-xs text-teal-800">수정</Link>
-              <DeleteButton id={p.id} />
+              <DeleteButton action={deleteProcedure} id={p.id} />
             </div>
           </div>
         ))}

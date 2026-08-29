@@ -1,3 +1,4 @@
+import { DeleteButton } from "@/components/delete-button";
 import { createNotice, deleteNotice, toggleNoticePin, updateNotice } from "@/lib/actions/notices";
 import { requireUser } from "@/lib/auth";
 import { formatKoreanDateTime } from "@/lib/utils";
@@ -76,12 +77,7 @@ export default async function NoticesPage() {
                     {n.pinned ? "고정 해제" : "고정"}
                   </button>
                 </form>
-                <form action={deleteNotice}>
-                  <input type="hidden" name="id" value={n.id} />
-                  <button type="submit" className="text-xs text-stone-400 hover:text-red-700">
-                    삭제
-                  </button>
-                </form>
+                <DeleteButton action={deleteNotice} id={n.id} />
               </div>
             </div>
             <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-stone-700">{n.body}</p>

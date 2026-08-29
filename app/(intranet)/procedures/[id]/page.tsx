@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { DeleteButton } from "@/components/delete-button";
 import { deleteProcedure, updateProcedure } from "@/lib/actions/knowledge";
 import { requireUser } from "@/lib/auth";
 import type { Procedure } from "@/lib/types";
@@ -25,11 +26,7 @@ export default async function ProcedureDetailPage({
           <p className="text-xs text-teal-800">{procedure.category}</p>
           <h1 className="mt-1 text-2xl font-semibold text-[var(--navy)]">{procedure.title}</h1>
         </div>
-        <form action={deleteProcedure}>
-          <input type="hidden" name="id" value={procedure.id} />
-          <input type="hidden" name="from" value="detail" />
-          <button type="submit" className="text-sm text-red-700">삭제</button>
-        </form>
+        <DeleteButton action={deleteProcedure} id={procedure.id} extraFields={{ from: "detail" }} className="text-sm text-red-700" />
       </div>
       {procedure.indication ? (
         <section className="rounded-2xl border border-[var(--line)] bg-white p-5">

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { DeleteButton } from "@/components/delete-button";
 import { deleteConsentGuide, updateConsentGuide } from "@/lib/actions/knowledge";
 import { ConsentChecklist } from "@/components/consent-checklist";
 import { requireUser } from "@/lib/auth";
@@ -34,11 +35,7 @@ export default async function ConsentDetailPage({
             <p className="mt-2 text-sm leading-7 text-stone-600">{guide.summary}</p>
           ) : null}
         </div>
-        <form action={deleteConsentGuide}>
-          <input type="hidden" name="id" value={guide.id} />
-          <input type="hidden" name="from" value="detail" />
-          <button type="submit" className="text-sm text-red-700">삭제</button>
-        </form>
+        <DeleteButton action={deleteConsentGuide} id={guide.id} extraFields={{ from: "detail" }} className="text-sm text-red-700" />
       </div>
       <ConsentChecklist guide={guide} />
       {guide.notes ? (
