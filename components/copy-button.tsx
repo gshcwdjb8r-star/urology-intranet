@@ -8,7 +8,9 @@ export function CopyButton({ text, label = "복사" }: { text: string; label?: s
     <button
       type="button"
       className="rounded-md border border-[var(--line)] px-2 py-1 text-xs text-stone-600 hover:bg-stone-50"
-      onClick={async () => {
+      onClick={async (e) => {
+        e.preventDefault();
+        e.stopPropagation();
         await navigator.clipboard.writeText(text);
         setDone(true);
         setTimeout(() => setDone(false), 1500);

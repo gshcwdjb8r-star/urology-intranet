@@ -151,7 +151,12 @@ export function SnippetBrowser({ snippets }: { snippets: Snippet[] }) {
                       >
                         <span className="font-medium">{s.title}</span>
                       </button>
-                      <CopyButton text={s.body} label="복사" />
+                      <span
+                        onClick={(e) => e.stopPropagation()}
+                        onPointerDown={(e) => e.stopPropagation()}
+                      >
+                        <CopyButton text={s.body} label="복사" />
+                      </span>
                       <button
                         type="button"
                         className="text-xs text-teal-800"

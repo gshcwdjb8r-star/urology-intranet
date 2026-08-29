@@ -27,7 +27,7 @@ export default async function DocumentsPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-semibold text-[var(--navy)]">문서 참고 문구</h1>
+        <h1 className="text-2xl font-semibold text-[var(--navy)]">각종 문서양식</h1>
         <p className="mt-1 text-sm text-stone-600">
           카테고리를 선택하거나 검색해서 문구를 찾고, 복사해서 EMR에 붙여 넣으세요.
         </p>
