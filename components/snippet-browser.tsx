@@ -162,17 +162,7 @@ export function SnippetBrowser({ snippets }: { snippets: Snippet[] }) {
                       >
                         수정
                       </button>
-                      <form action={deleteSnippet}>
-                        <input type="hidden" name="id" value={s.id} />
-                        <input
-                          type="hidden"
-                          name="source_id"
-                          value={s.sourceId ?? (s.id.startsWith("default-") ? s.id : "")}
-                        />
-                        <button type="submit" className="text-xs text-stone-400 hover:text-red-700">
-                          삭제
-                        </button>
-                      </form>
+
                     </div>
                     {editing ? (
                       <form action={saveSnippet} className="space-y-3 border-t border-[var(--line)] px-4 py-3">
@@ -200,12 +190,27 @@ export function SnippetBrowser({ snippets }: { snippets: Snippet[] }) {
                           defaultValue={s.body}
                           className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm"
                         />
-                        <button
-                          type="submit"
-                          className="rounded-lg bg-[var(--navy)] px-4 py-2 text-sm font-medium text-white"
-                        >
-                          저장
-                        </button>
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="submit"
+                            className="rounded-lg bg-[var(--navy)] px-4 py-2 text-sm font-medium text-white"
+                          >
+                            저장
+                          </button>
+                          <button
+                            type="button"
+                            className="text-sm text-stone-400 hover:text-red-700"
+                            onClick={async () => {
+                              if (!confirm("정말 삭제하시겠습니까?")) return;
+                              const fd = new FormData();
+                              fd.append("id", s.id);
+                              fd.append("source_id", s.sourceId ?? (s.id.startsWith("default-") ? s.id : ""));
+                              await deleteSnippet(fd);
+                            }}
+                          >
+                            삭제
+                          </button>
+                        </div>
                       </form>
                     ) : open ? (
                       <pre className="select-text border-t border-[var(--line)] whitespace-pre-wrap px-4 py-3 font-sans text-sm leading-7 text-stone-700">
