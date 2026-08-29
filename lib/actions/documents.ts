@@ -32,8 +32,8 @@ export async function saveDocument(formData: FormData) {
       .update({ data: entries, title, updated_at: new Date().toISOString() })
       .eq("id", id);
     revalidatePath("/documents");
-    revalidatePath(`/documents/${id}`);
-    redirect(`/documents/${id}`);
+    revalidatePath(`/documents/saved/${id}`);
+    redirect(`/documents/saved/${id}`);
   }
 
   const { data, error } = await supabase
@@ -52,7 +52,7 @@ export async function saveDocument(formData: FormData) {
   }
 
   revalidatePath("/documents");
-  redirect(`/documents/${data.id}`);
+  redirect(`/documents/saved/${data.id}`);
 }
 
 export async function deleteDocument(formData: FormData) {

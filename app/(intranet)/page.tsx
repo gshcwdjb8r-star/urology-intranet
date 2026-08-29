@@ -109,7 +109,7 @@ export default async function HomePage() {
         <h2 className="mb-3 text-lg font-semibold">바로가기</h2>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {[
-            { href: "/documents", title: "각종 문서양식", desc: "진단서·소견서 작성 참고" },
+            { href: "/documents", title: "각종 문서양식", desc: "진단서·소견서 작성" },
             { href: "/consents", title: "수술동의 설명", desc: "설명 체크리스트" },
             { href: "/orders", title: "입원 오더", desc: "입원·퇴원·수혈" },
             { href: "/procedures", title: "술기·수술", desc: "기본 술기 정리" },

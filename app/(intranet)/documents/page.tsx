@@ -15,8 +15,8 @@ export default async function DocumentsPage() {
       <header>
         <h1 className="text-2xl font-semibold text-[var(--navy)]">각종 문서양식</h1>
         <p className="mt-1 text-sm text-stone-600">
-          진단서, 소견서 등을 EMR·원무 공식 서식에 작성할 때 확인할 항목과 문장 예입니다.
-          병원 공식 문서를 대체하지 않습니다.
+          양식을 골라 내용을 입력한 뒤 저장·인쇄할 수 있습니다. 작성 요령과 문장 예는 입력
+          화면 아래에 있습니다. 병원 공식 문서를 대체하지 않습니다.
         </p>
       </header>
 
@@ -32,7 +32,7 @@ export default async function DocumentsPage() {
               <p className="text-xs text-teal-800">{t.category}</p>
               <p className="mt-1 font-medium">{t.title}</p>
               <p className="mt-2 text-sm text-stone-500">
-                {extra?.purpose ?? t.description}
+                {t.description ?? extra?.purpose}
               </p>
             </Link>
           );

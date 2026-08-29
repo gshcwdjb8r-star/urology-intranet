@@ -48,6 +48,7 @@ export function DocumentForm({
       >
         저장
       </button>
+      <p className="text-xs text-stone-500">저장하면 인쇄용 화면으로 이동합니다.</p>
     </form>
   );
 }

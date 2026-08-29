@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CopyButton } from "@/components/copy-button";
-import { PrintButton } from "@/components/print-button";
+import { DocumentForm } from "@/components/document-form";
 import { requireUser } from "@/lib/auth";
 import { guideForTitle } from "@/lib/document-guides";
 import type { DocumentTemplate } from "@/lib/types";
@@ -32,7 +32,6 @@ export default async function DocumentGuidePage({
           <p className="mt-2 text-xs text-teal-800">{template.category}</p>
           <h1 className="text-2xl font-semibold text-[var(--navy)]">{template.title}</h1>
         </div>
-        <PrintButton />
       </div>
 
       {extra ? (
@@ -42,17 +41,8 @@ export default async function DocumentGuidePage({
       ) : null}
 
       <section className="rounded-2xl border border-[var(--line)] bg-white p-5">
-        <h2 className="font-semibold">작성 시 확인할 항목</h2>
-        <ul className="mt-3 space-y-2 text-sm">
-          {(template.fields ?? []).map((field) => (
-            <li key={field.name} className="flex gap-2 border-b border-dashed border-stone-200 py-2">
-              <span className="w-40 shrink-0 text-stone-500">{field.label}</span>
-              <span className="text-stone-400">
-                {field.required ? "필수" : "해당되면 기재"}
-              </span>
-            </li>
-          ))}
-        </ul>
+        <h2 className="mb-4 font-semibold">작성</h2>
+        <DocumentForm template={template} />
       </section>
 
       {extra?.tips?.length ? (
