@@ -18,8 +18,8 @@ export const NAV_ITEMS = [
   { href: "/notices", label: "공지사항", icon: "megaphone" },
   { href: "/documents", label: "각종 문서양식", icon: "file" },
   { href: "/consents", label: "수술동의 설명", icon: "clipboard" },
-  { href: "/terms", label: "약어·용어", icon: "book" },
+  { href: "/orders", label: "입원 오더", icon: "list" },
   { href: "/procedures", label: "술기·수술", icon: "activity" },
   { href: "/medications", label: "약품", icon: "pill" },
-  { href: "/orders", label: "입원 오더", icon: "list" },
+  { href: "/terms", label: "약어·용어", icon: "book" },
 ] as const;

@@ -2,11 +2,25 @@
 
 import { useMemo, useState } from "react";
 import { addDutyShift, deleteDutyShift } from "@/lib/actions/duty";
-import { DUTY_LABELS } from "@/lib/constants";
+import { DUTY_LABELS, DUTY_SHORT } from "@/lib/constants";
 import type { DutyShift, DutyType } from "@/lib/types";
 import { monthGrid, toDateKey } from "@/lib/utils";
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
+const TYPE_ORDER: DutyType[] = ["staff", "trainee", "nurse"];
+const TYPE_CHIP: Record<DutyType, string> = {
+  staff: "bg-teal-700/10 text-teal-900",
+  trainee: "bg-amber-100 text-amber-950",
+  nurse: "bg-sky-100 text-sky-950",
+};
+
+function sortShifts(list: DutyShift[]) {
+  return [...list].sort((a, b) => {
+    const typeDiff = TYPE_ORDER.indexOf(a.duty_type) - TYPE_ORDER.indexOf(b.duty_type);
+    if (typeDiff !== 0) return typeDiff;
+    return a.person_name.localeCompare(b.person_name, "ko");
+  });
+}
 
 export function DutyCalendar({
   shifts,
@@ -19,7 +33,7 @@ export function DutyCalendar({
   const [cursor, setCursor] = useState(
     () => new Date(today.getFullYear(), today.getMonth(), 1),
   );
-  const [type, setType] = useState<DutyType>(initialType ?? "staff");
+  const [addType, setAddType] = useState<DutyType>(initialType ?? "staff");
   const [selected, setSelected] = useState(toDateKey(today));
 
   const cells = useMemo(
@@ -29,13 +43,16 @@ export function DutyCalendar({
 
   const byDate = useMemo(() => {
     const map = new Map<string, DutyShift[]>();
-    for (const shift of shifts.filter((s) => s.duty_type === type)) {
+    for (const shift of shifts) {
       const list = map.get(shift.duty_date) ?? [];
       list.push(shift);
       map.set(shift.duty_date, list);
     }
+    for (const [key, list] of map) {
+      map.set(key, sortShifts(list));
+    }
     return map;
-  }, [shifts, type]);
+  }, [shifts]);
 
   const selectedShifts = byDate.get(selected) ?? [];
   const monthLabel = new Intl.DateTimeFormat("ko-KR", {
@@ -68,18 +85,14 @@ export function DutyCalendar({
               다음
             </button>
           </div>
-          <div className="flex rounded-lg bg-stone-100 p-1 text-xs sm:text-sm">
-            {(Object.keys(DUTY_LABELS) as DutyType[]).map((key) => (
-              <button
+          <div className="flex flex-wrap gap-2 text-[11px]">
+            {TYPE_ORDER.map((key) => (
+              <span
                 key={key}
-                type="button"
-                onClick={() => setType(key)}
-                className={`rounded-md px-2.5 py-1.5 ${
-                  type === key ? "bg-white font-medium shadow-sm" : "text-stone-500"
-                }`}
+                className={`rounded-full px-2 py-0.5 ${TYPE_CHIP[key]}`}
               >
-                {DUTY_LABELS[key]}
-              </button>
+                {DUTY_SHORT[key]}
+              </span>
             ))}
           </div>
         </div>
@@ -103,7 +116,7 @@ export function DutyCalendar({
                 key={key}
                 type="button"
                 onClick={() => setSelected(key)}
-                className={`min-h-24 bg-white p-1.5 text-left transition sm:min-h-28 ${
+                className={`min-h-28 bg-white p-1.5 text-left transition sm:min-h-32 ${
                   inMonth ? "" : "bg-stone-50 text-stone-400"
                 } ${isSelected ? "ring-2 ring-inset ring-teal-700" : ""}`}
               >
@@ -115,16 +128,16 @@ export function DutyCalendar({
                   {date.getDate()}
                 </span>
                 <div className="mt-1 space-y-0.5">
-                  {names.slice(0, 3).map((s) => (
+                  {names.slice(0, 4).map((s) => (
                     <p
                       key={s.id}
-                      className="truncate rounded bg-teal-700/10 px-1 text-[11px] text-teal-900"
+                      className={`truncate rounded px-1 text-[10px] leading-4 sm:text-[11px] ${TYPE_CHIP[s.duty_type]}`}
                     >
-                      {s.person_name}
+                      {DUTY_SHORT[s.duty_type]} {s.person_name}
                     </p>
                   ))}
-                  {names.length > 3 ? (
-                    <p className="text-[10px] text-stone-500">+{names.length - 3}</p>
+                  {names.length > 4 ? (
+                    <p className="text-[10px] text-stone-500">+{names.length - 4}</p>
                   ) : null}
                 </div>
               </button>
@@ -134,7 +147,7 @@ export function DutyCalendar({
       </section>
 
       <aside className="h-fit rounded-2xl border border-[var(--line)] bg-white p-5">
-        <p className="text-xs text-stone-500">{DUTY_LABELS[type]}</p>
+        <p className="text-xs text-stone-500">그날 당직</p>
         <h3 className="mt-1 text-lg font-semibold">
           {new Intl.DateTimeFormat("ko-KR", {
             month: "long",
@@ -142,35 +155,62 @@ export function DutyCalendar({
             weekday: "short",
           }).format(new Date(selected + "T00:00:00"))}
         </h3>
-        <ul className="mt-4 space-y-2">
-          {selectedShifts.length === 0 ? (
-            <li className="text-sm text-stone-500">등록된 당직자가 없습니다.</li>
-          ) : (
-            selectedShifts.map((shift) => (
-              <li
-                key={shift.id}
-                className="flex items-start justify-between gap-2 rounded-lg bg-stone-50 px-3 py-2"
-              >
-                <div>
-                  <p className="text-sm font-medium">{shift.person_name}</p>
-                  {shift.note ? (
-                    <p className="text-xs text-stone-500">{shift.note}</p>
-                  ) : null}
-                </div>
-                <form action={deleteDutyShift}>
-                  <input type="hidden" name="id" value={shift.id} />
-                  <button type="submit" className="text-xs text-stone-400 hover:text-red-700">
-                    삭제
-                  </button>
-                </form>
-              </li>
-            ))
-          )}
-        </ul>
+        <div className="mt-4 space-y-4">
+          {TYPE_ORDER.map((key) => {
+            const list = selectedShifts.filter((s) => s.duty_type === key);
+            return (
+              <div key={key}>
+                <p className="mb-1.5 text-xs font-medium text-stone-500">{DUTY_LABELS[key]}</p>
+                {list.length === 0 ? (
+                  <p className="text-sm text-stone-400">미정</p>
+                ) : (
+                  <ul className="space-y-2">
+                    {list.map((shift) => (
+                      <li
+                        key={shift.id}
+                        className="flex items-start justify-between gap-2 rounded-lg bg-stone-50 px-3 py-2"
+                      >
+                        <div>
+                          <p className="text-sm font-medium">{shift.person_name}</p>
+                          {shift.note ? (
+                            <p className="text-xs text-stone-500">{shift.note}</p>
+                          ) : null}
+                        </div>
+                        <form action={deleteDutyShift}>
+                          <input type="hidden" name="id" value={shift.id} />
+                          <button
+                            type="submit"
+                            className="text-xs text-stone-400 hover:text-red-700"
+                          >
+                            삭제
+                          </button>
+                        </form>
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            );
+          })}
+        </div>
 
         <form action={addDutyShift} className="mt-5 space-y-3 border-t border-[var(--line)] pt-4">
-          <input type="hidden" name="duty_type" value={type} />
           <input type="hidden" name="duty_date" value={selected} />
+          <label className="block text-sm">
+            <span className="mb-1 block text-stone-600">종류</span>
+            <select
+              name="duty_type"
+              value={addType}
+              onChange={(e) => setAddType(e.target.value as DutyType)}
+              className="w-full rounded-lg border border-stone-300 px-3 py-2"
+            >
+              {TYPE_ORDER.map((key) => (
+                <option key={key} value={key}>
+                  {DUTY_LABELS[key]}
+                </option>
+              ))}
+            </select>
+          </label>
           <label className="block text-sm">
             <span className="mb-1 block text-stone-600">이름</span>
             <input

@@ -148,8 +148,8 @@ export function AppShell({
           메뉴
         </button>
         <p className="text-sm font-semibold">성빈센트병원 비뇨의학과</p>
-        <span className="rounded-full bg-teal-700/10 px-2 py-0.5 text-xs text-teal-800">
-          {profile.role}
+        <span className="max-w-[7.5rem] truncate rounded-full bg-teal-700/10 px-2 py-0.5 text-xs text-teal-800">
+          {profile.name}
         </span>
       </header>
 
