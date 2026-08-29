@@ -133,7 +133,7 @@ export function DutyCalendar({
                       key={s.id}
                       className={`truncate rounded px-1 text-[10px] leading-4 sm:text-[11px] ${TYPE_CHIP[s.duty_type]}`}
                     >
-                      {DUTY_SHORT[s.duty_type]} {s.person_name}
+                      {s.person_name}
                     </p>
                   ))}
                   {names.length > 4 ? (
