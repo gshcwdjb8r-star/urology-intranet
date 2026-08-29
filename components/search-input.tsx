@@ -25,13 +25,13 @@ export function SearchInput({ placeholder = "검색..." }: { placeholder?: strin
         type="search"
         defaultValue={searchParams.get("q") ?? ""}
         placeholder={placeholder}
-        className="flex-1 rounded-xl border border-[var(--line)] bg-white px-4 py-2 text-sm outline-none focus:border-teal-500"
+        className="min-w-0 flex-1 rounded-xl border border-[var(--line)] bg-white px-4 py-2 text-sm outline-none focus:border-teal-500"
         onKeyDown={(e) => { if (e.key === "Enter") submit(); }}
       />
       <button
         type="button"
         onClick={submit}
-        className="rounded-xl bg-[var(--navy)] px-4 py-2 text-sm font-medium text-white"
+        className="shrink-0 whitespace-nowrap rounded-xl bg-[var(--navy)] px-4 py-2 text-sm font-medium text-white"
       >
         검색
       </button>
