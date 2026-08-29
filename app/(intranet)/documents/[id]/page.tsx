@@ -51,7 +51,7 @@ export default async function DocumentDetailPage({
 
       <article className="print-sheet rounded-2xl border border-[var(--line)] bg-white p-8">
         <div className="print-only mb-8 text-center">
-          <p className="text-sm tracking-widest text-stone-500">비뇨의학과</p>
+          <p className="text-sm tracking-widest text-stone-500">성빈센트병원 비뇨의학과</p>
           <h2 className="mt-2 text-2xl font-semibold">
             {template?.title ?? "문서"}
           </h2>

@@ -28,10 +28,6 @@ export async function signup(_prev: AuthState, formData: FormData): Promise<Auth
   const role = String(formData.get("role") ?? "스텝");
 
   if (!name) return { error: "이름을 입력해 주세요." };
-  if (password.length < 8) {
-    return { error: "비밀번호는 8자 이상이어야 합니다." };
-  }
-
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
     email,

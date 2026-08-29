@@ -9,8 +9,8 @@ const noto = Noto_Sans_KR({
 });
 
 export const metadata: Metadata = {
-  title: "비뇨의학과 인트라넷",
-  description: "스텝·전담간호사 공용 비뇨의학과 인트라넷",
+  title: "성빈센트병원 비뇨의학과 인트라넷",
+  description: "성빈센트병원 비뇨의학과 스텝·전담간호사 공용 인트라넷",
 };
 
 export default function RootLayout({

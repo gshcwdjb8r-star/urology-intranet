@@ -1,4 +1,4 @@
--- 비뇨의학과 인트라넷 스키마
+-- 성빈센트병원 비뇨의학과 인트라넷 스키마
 -- Supabase SQL Editor에서 실행하세요.
 
 create extension if not exists "pgcrypto";
