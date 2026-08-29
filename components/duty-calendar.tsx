@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { addDutyShift, deleteDutyShift } from "@/lib/actions/duty";
 import { DUTY_LABELS, DUTY_SHORT } from "@/lib/constants";
 import type { DutyShift, DutyType } from "@/lib/types";
-import { monthGrid, toDateKey } from "@/lib/utils";
+import { formatKoreanDate, monthGrid, toDateKey } from "@/lib/utils";
 
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 const TYPE_ORDER: DutyType[] = ["staff", "trainee", "nurse"];
@@ -29,12 +29,11 @@ export function DutyCalendar({
   shifts: DutyShift[];
   initialType?: DutyType;
 }) {
-  const today = new Date();
-  const [cursor, setCursor] = useState(
-    () => new Date(today.getFullYear(), today.getMonth(), 1),
-  );
+  const todayKey = toDateKey();
+  const [y, m] = todayKey.split("-").map(Number);
+  const [cursor, setCursor] = useState(() => new Date(y, (m ?? 1) - 1, 1));
   const [addType, setAddType] = useState<DutyType>(initialType ?? "staff");
-  const [selected, setSelected] = useState(toDateKey(today));
+  const [selected, setSelected] = useState(todayKey);
 
   const cells = useMemo(
     () => monthGrid(cursor.getFullYear(), cursor.getMonth()),
@@ -110,7 +109,7 @@ export function DutyCalendar({
             const inMonth = date.getMonth() === cursor.getMonth();
             const names = byDate.get(key) ?? [];
             const isSelected = key === selected;
-            const isToday = key === toDateKey(today);
+            const isToday = key === todayKey;
             return (
               <button
                 key={key}
@@ -148,13 +147,7 @@ export function DutyCalendar({
 
       <aside className="h-fit rounded-2xl border border-[var(--line)] bg-white p-5">
         <p className="text-xs text-stone-500">그날 당직</p>
-        <h3 className="mt-1 text-lg font-semibold">
-          {new Intl.DateTimeFormat("ko-KR", {
-            month: "long",
-            day: "numeric",
-            weekday: "short",
-          }).format(new Date(selected + "T00:00:00"))}
-        </h3>
+        <h3 className="mt-1 text-lg font-semibold">{formatKoreanDate(selected)}</h3>
         <div className="mt-4 space-y-4">
           {TYPE_ORDER.map((key) => {
             const list = selectedShifts.filter((s) => s.duty_type === key);

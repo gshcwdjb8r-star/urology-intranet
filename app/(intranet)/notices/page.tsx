@@ -1,5 +1,6 @@
 import { createNotice, deleteNotice, toggleNoticePin, updateNotice } from "@/lib/actions/notices";
 import { requireUser } from "@/lib/auth";
+import { formatKoreanDateTime } from "@/lib/utils";
 
 export default async function NoticesPage() {
   const { supabase } = await requireUser();
@@ -64,7 +65,7 @@ export default async function NoticesPage() {
                 </div>
                 <p className="mt-1 text-xs text-stone-500">
                   {(n.profiles as { name: string } | null)?.name ?? "작성자"} ·{" "}
-                  {new Date(n.created_at).toLocaleString("ko-KR")}
+                  {formatKoreanDateTime(n.created_at)}
                 </p>
               </div>
               <div className="flex gap-2">
