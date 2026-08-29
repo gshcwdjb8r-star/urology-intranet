@@ -62,6 +62,7 @@ export function MedicationsBrowser({ medications }: { medications: Medication[] 
                 <div className="flex gap-2">
                   <button type="submit" className="rounded-lg bg-[var(--navy)] px-3 py-1.5 text-xs text-white">저장</button>
                   <button type="button" className="text-xs text-stone-500" onClick={() => setEditingId(null)}>취소</button>
+                  <button type="button" className="ml-auto text-xs text-stone-400 hover:text-red-700" onClick={async () => { if (!confirm("정말 삭제하시겠습니까?")) return; const fd = new FormData(); fd.append("id", m.id); await deleteMedication(fd); }}>삭제</button>
                 </div>
               </form>
             ) : (
@@ -71,13 +72,7 @@ export function MedicationsBrowser({ medications }: { medications: Medication[] 
                     <p className="text-xs text-teal-800">{m.category}</p>
                     <h2 className="mt-1 text-lg font-semibold">{m.name}</h2>
                   </div>
-                  <div className="flex shrink-0 gap-2">
-                    <button type="button" className="text-xs text-teal-800" onClick={() => setEditingId(m.id)}>수정</button>
-                    <form action={deleteMedication}>
-                      <input type="hidden" name="id" value={m.id} />
-                      <button type="submit" className="text-xs text-stone-400 hover:text-red-700">삭제</button>
-                    </form>
-                  </div>
+                  <button type="button" className="text-xs text-teal-800" onClick={() => setEditingId(m.id)}>수정</button>
                 </div>
                 {m.generic_name ? (
                   <p className="text-sm text-stone-500">{m.generic_name}</p>

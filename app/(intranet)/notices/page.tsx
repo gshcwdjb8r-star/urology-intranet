@@ -77,7 +77,6 @@ export default async function NoticesPage() {
                     {n.pinned ? "고정 해제" : "고정"}
                   </button>
                 </form>
-                <DeleteButton action={deleteNotice} id={n.id} />
               </div>
             </div>
             <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-stone-700">{n.body}</p>
@@ -91,7 +90,10 @@ export default async function NoticesPage() {
                   <input type="checkbox" name="pinned" defaultChecked={n.pinned} className="accent-teal-800" />
                   상단 고정
                 </label>
-                <button type="submit" className="rounded-lg bg-[var(--navy)] px-3 py-1.5 text-xs text-white">저장</button>
+                <div className="flex items-center gap-3">
+                  <button type="submit" className="rounded-lg bg-[var(--navy)] px-3 py-1.5 text-xs text-white">저장</button>
+                  <DeleteButton action={deleteNotice} id={n.id} message="공지를 삭제하시겠습니까?" className="text-xs text-stone-400 hover:text-red-700" />
+                </div>
               </form>
             </details>
           </li>

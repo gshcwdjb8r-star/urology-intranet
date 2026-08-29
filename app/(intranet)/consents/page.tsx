@@ -1,6 +1,5 @@
-import { DeleteButton } from "@/components/delete-button";
 import Link from "next/link";
-import { addConsentGuide, deleteConsentGuide } from "@/lib/actions/knowledge";
+import { addConsentGuide } from "@/lib/actions/knowledge";
 import { requireUser } from "@/lib/auth";
 import type { ConsentGuide } from "@/lib/types";
 
@@ -35,7 +34,6 @@ export default async function ConsentsPage() {
               </Link>
               <div className="flex shrink-0 gap-2">
                 <Link href={`/consents/${g.id}`} className="text-xs text-teal-800">수정</Link>
-                <DeleteButton action={deleteConsentGuide} id={g.id} />
               </div>
             </div>
           </div>

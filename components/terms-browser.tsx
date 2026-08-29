@@ -72,6 +72,7 @@ export function TermsBrowser({ terms }: { terms: Term[] }) {
                       <div className="flex gap-2">
                         <button type="submit" className="rounded-lg bg-[var(--navy)] px-3 py-1.5 text-xs text-white">저장</button>
                         <button type="button" className="text-xs text-stone-500" onClick={() => setEditingId(null)}>취소</button>
+                      <button type="button" className="ml-auto text-xs text-stone-400 hover:text-red-700" onClick={async () => { if (!confirm("정말 삭제하시겠습니까?")) return; const fd = new FormData(); fd.append("id", t.id); await deleteTerm(fd); }}>삭제</button>
                       </div>
                     </form>
                   </td>
@@ -91,11 +92,7 @@ export function TermsBrowser({ terms }: { terms: Term[] }) {
                     <td className="px-4 py-3">{t.korean}</td>
                     <td className="px-4 py-3 leading-6 text-stone-700">{t.definition}</td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <button type="button" className="mr-2 text-xs text-teal-800" onClick={() => setEditingId(t.id)}>수정</button>
-                      <form action={deleteTerm} className="inline">
-                        <input type="hidden" name="id" value={t.id} />
-                        <button type="submit" className="text-xs text-stone-400 hover:text-red-700">삭제</button>
-                      </form>
+                      <button type="button" className="text-xs text-teal-800" onClick={() => setEditingId(t.id)}>수정</button>
                     </td>
                   </>
                 )}
