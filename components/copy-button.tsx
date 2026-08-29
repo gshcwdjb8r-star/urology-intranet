@@ -2,6 +2,29 @@
 
 import { useState } from "react";
 
+async function copyPlainText(value: string) {
+  const text = value ?? "";
+  if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+    try {
+      await navigator.clipboard.writeText(text);
+      return;
+    } catch {
+      /* fallback below */
+    }
+  }
+  const area = document.createElement("textarea");
+  area.value = text;
+  area.setAttribute("readonly", "");
+  area.style.position = "fixed";
+  area.style.top = "0";
+  area.style.left = "-9999px";
+  document.body.appendChild(area);
+  area.focus();
+  area.select();
+  document.execCommand("copy");
+  document.body.removeChild(area);
+}
+
 export function CopyButton({ text, label = "복사" }: { text: string; label?: string }) {
   const [done, setDone] = useState(false);
   return (
@@ -11,7 +34,8 @@ export function CopyButton({ text, label = "복사" }: { text: string; label?: s
       onClick={async (e) => {
         e.preventDefault();
         e.stopPropagation();
-        await navigator.clipboard.writeText(text);
+        await copyPlainText(text);
+        window.getSelection()?.removeAllRanges();
         setDone(true);
         setTimeout(() => setDone(false), 1500);
       }}

@@ -140,7 +140,7 @@ export function SnippetBrowser({ snippets }: { snippets: Snippet[] }) {
                     key={s.id}
                     className="rounded-2xl border border-[var(--line)] bg-white"
                   >
-                    <div className="flex items-center gap-2 px-3 py-2.5">
+                    <div className="flex select-none items-center gap-2 px-3 py-2.5">
                       <button
                         type="button"
                         className="min-w-0 flex-1 text-left"
@@ -151,12 +151,7 @@ export function SnippetBrowser({ snippets }: { snippets: Snippet[] }) {
                       >
                         <span className="font-medium">{s.title}</span>
                       </button>
-                      <span
-                        onClick={(e) => e.stopPropagation()}
-                        onPointerDown={(e) => e.stopPropagation()}
-                      >
-                        <CopyButton text={s.body} label="복사" />
-                      </span>
+                      <CopyButton text={s.body} label="복사" />
                       <button
                         type="button"
                         className="text-xs text-teal-800"
@@ -210,7 +205,7 @@ export function SnippetBrowser({ snippets }: { snippets: Snippet[] }) {
                         </button>
                       </form>
                     ) : open ? (
-                      <pre className="border-t border-[var(--line)] whitespace-pre-wrap px-4 py-3 font-sans text-sm leading-7 text-stone-700">
+                      <pre className="select-text border-t border-[var(--line)] whitespace-pre-wrap px-4 py-3 font-sans text-sm leading-7 text-stone-700">
                         {s.body}
                       </pre>
                     ) : null}
