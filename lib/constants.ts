@@ -10,7 +10,7 @@ export const DUTY_SHORT: Record<"staff" | "trainee" | "nurse", string> = {
   nurse: "전담간호사",
 };
 
-export const ROLES = ["스텝", "전담간호사", "전공의", "인턴", "기타"] as const;
+export const ROLES = ["스텝", "레지던트", "인턴", "전담간호사"] as const;
 
 export const NAV_ITEMS = [
   { href: "/", label: "홈", icon: "home" },

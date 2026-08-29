@@ -6,25 +6,33 @@ import { requireUser } from "@/lib/auth";
 
 export async function saveDocument(formData: FormData) {
   const { user, supabase } = await requireUser();
-  const templateId = String(formData.get("template_id"));
+  const rawTemplateId = String(formData.get("template_id") ?? "");
+  const formTitle = String(formData.get("form_title") ?? "").trim();
+  const templateId = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+    rawTemplateId,
+  )
+    ? rawTemplateId
+    : "";
   const id = String(formData.get("id") ?? "");
   const entries: Record<string, string> = {};
 
   for (const [key, value] of formData.entries()) {
-    if (key === "template_id" || key === "id" || key === "title") continue;
+    if (key === "template_id" || key === "id" || key === "title" || key === "form_title") continue;
     entries[key] = String(value);
   }
 
-  const { data: template } = await supabase
-    .from("document_templates")
-    .select("title")
-    .eq("id", templateId)
-    .single();
+  let templateTitle = formTitle || "문서";
+  if (templateId) {
+    const { data: template } = await supabase
+      .from("document_templates")
+      .select("title")
+      .eq("id", templateId)
+      .maybeSingle();
+    if (template?.title) templateTitle = template.title;
+  }
 
   const patient = entries.patient_name?.trim();
-  const title = patient
-    ? `${template?.title ?? "문서"} · ${patient}`
-    : (template?.title ?? "문서");
+  const title = patient ? `${templateTitle} · ${patient}` : templateTitle;
 
   if (id) {
     await supabase
@@ -39,7 +47,7 @@ export async function saveDocument(formData: FormData) {
   const { data, error } = await supabase
     .from("documents")
     .insert({
-      template_id: templateId,
+      template_id: templateId || null,
       title,
       data: entries,
       created_by: user.id,

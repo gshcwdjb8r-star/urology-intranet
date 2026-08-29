@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { requireUser } from "@/lib/auth";
+import { ROLES } from "@/lib/constants";
 import { createClient } from "@/lib/supabase/server";
 
 export type AuthState = { error?: string } | undefined;
@@ -48,6 +50,19 @@ export async function signup(_prev: AuthState, formData: FormData): Promise<Auth
 
   revalidatePath("/", "layout");
   redirect("/");
+}
+
+export async function updateRole(formData: FormData) {
+  const { user, supabase } = await requireUser();
+  const role = String(formData.get("role") ?? "");
+  if (!(ROLES as readonly string[]).includes(role)) return;
+
+  await supabase
+    .from("profiles")
+    .update({ role, updated_at: new Date().toISOString() })
+    .eq("id", user.id);
+  await supabase.auth.updateUser({ data: { role } });
+  revalidatePath("/", "layout");
 }
 
 export async function logout() {

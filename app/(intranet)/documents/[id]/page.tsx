@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { CopyButton } from "@/components/copy-button";
 import { DocumentForm } from "@/components/document-form";
 import { requireUser } from "@/lib/auth";
-import { guideForTitle } from "@/lib/document-guides";
+import { FALLBACK_TEMPLATES, guideForTitle, parseTemplateFields } from "@/lib/document-guides";
 import type { DocumentTemplate } from "@/lib/types";
 
 export default async function DocumentGuidePage({
@@ -18,8 +18,19 @@ export default async function DocumentGuidePage({
     .select("*")
     .eq("id", id)
     .maybeSingle();
-  if (!data) notFound();
-  const template = data as DocumentTemplate;
+  const fallback = FALLBACK_TEMPLATES.find((t) => t.id === id);
+  if (!data && !fallback) notFound();
+  const template = (data as DocumentTemplate | null)
+    ? {
+        ...(data as DocumentTemplate),
+        fields:
+          parseTemplateFields((data as DocumentTemplate).fields).length > 0
+            ? parseTemplateFields((data as DocumentTemplate).fields)
+            : (FALLBACK_TEMPLATES.find((t) => t.title === (data as DocumentTemplate).title)
+                ?.fields ?? []),
+      }
+    : fallback!;
+  if (!template.fields.length) notFound();
   const extra = guideForTitle(template.title);
 
   return (

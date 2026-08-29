@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { logout } from "@/lib/actions/auth";
-import { NAV_ITEMS } from "@/lib/constants";
+import { logout, updateRole } from "@/lib/actions/auth";
+import { NAV_ITEMS, ROLES } from "@/lib/constants";
 import type { Profile } from "@/lib/types";
 
 function NavIcon({ name }: { name: string }) {
@@ -111,7 +111,23 @@ export function AppShell({
         </nav>
         <div className="border-t border-white/10 p-4">
           <p className="truncate text-sm font-medium">{profile.name}</p>
-          <p className="mt-0.5 text-xs text-teal-200/90">{profile.role}</p>
+          <form action={updateRole} className="mt-2">
+            <label className="block text-[11px] text-white/50">역할</label>
+            <select
+              name="role"
+              defaultValue={
+                (ROLES as readonly string[]).includes(profile.role) ? profile.role : "스텝"
+              }
+              onChange={(e) => e.currentTarget.form?.requestSubmit()}
+              className="mt-1 w-full rounded-md border border-white/15 bg-white/10 px-2 py-1.5 text-xs text-white outline-none"
+            >
+              {ROLES.map((role) => (
+                <option key={role} value={role} className="text-stone-900">
+                  {role}
+                </option>
+              ))}
+            </select>
+          </form>
           <form action={logout} className="mt-3">
             <button
               type="submit"

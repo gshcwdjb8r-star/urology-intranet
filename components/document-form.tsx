@@ -1,5 +1,8 @@
+"use client";
+
 import type { DocumentTemplate, SavedDocument } from "@/lib/types";
 import { saveDocument } from "@/lib/actions/documents";
+import { parseTemplateFields } from "@/lib/document-guides";
 
 export function DocumentForm({
   template,
@@ -8,11 +11,13 @@ export function DocumentForm({
   template: DocumentTemplate;
   document?: SavedDocument;
 }) {
+  const fields = parseTemplateFields(template.fields);
   return (
     <form action={saveDocument} className="space-y-4">
       <input type="hidden" name="template_id" value={template.id} />
+      <input type="hidden" name="form_title" value={template.title} />
       {document ? <input type="hidden" name="id" value={document.id} /> : null}
-      {template.fields.map((field) => {
+      {fields.map((field) => {
         const value = document?.data?.[field.name] ?? "";
         const cls =
           "w-full rounded-lg border border-stone-300 px-3 py-2 outline-none focus:border-teal-700";

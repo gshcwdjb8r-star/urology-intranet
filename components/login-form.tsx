@@ -89,7 +89,7 @@ export function LoginForm({
                 ))}
               </select>
               <span className="mt-1 block text-xs text-stone-500">
-                역할은 화면에 표시되며, 메뉴 접근 권한은 모두 같습니다.
+                역할은 표시용이며 순서는 스텝, 레지던트, 인턴, 전담간호사입니다. 메뉴 권한은 같습니다.
               </span>
             </label>
           </>

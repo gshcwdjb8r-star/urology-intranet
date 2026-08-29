@@ -1,3 +1,5 @@
+import type { DocumentTemplate, TemplateField } from "@/lib/types";
+
 export type DocumentGuideExtra = {
   purpose: string;
   tips: string[];
@@ -83,4 +85,121 @@ EBL: 100 mL
 
 export function guideForTitle(title: string): DocumentGuideExtra | undefined {
   return DOCUMENT_GUIDES[title];
+}
+
+export const FALLBACK_TEMPLATES: DocumentTemplate[] = [
+  {
+    id: "local-diagnosis",
+    title: "일반 진단서",
+    category: "진단서",
+    description: "외래/입원 환자 진단서",
+    fields: [
+      { name: "patient_name", label: "환자 성명", type: "text", required: true },
+      { name: "reg_no", label: "등록번호", type: "text", required: true },
+      { name: "birthdate", label: "생년월일", type: "text" },
+      { name: "sex", label: "성별", type: "text" },
+      { name: "address", label: "주소", type: "text" },
+      { name: "diagnosis", label: "진단명", type: "textarea", required: true },
+      { name: "onset", label: "발병 연월일", type: "text" },
+      { name: "course", label: "치료 내용 및 향후 치료에 대한 소견", type: "textarea", required: true },
+      { name: "purpose", label: "용도", type: "text" },
+      { name: "doctor", label: "담당의", type: "text", required: true },
+    ],
+  },
+  {
+    id: "local-opinion",
+    title: "소견서",
+    category: "소견서",
+    description: "타과/타기관 회송 및 진료의뢰용",
+    fields: [
+      { name: "patient_name", label: "환자 성명", type: "text", required: true },
+      { name: "reg_no", label: "등록번호", type: "text" },
+      { name: "diagnosis", label: "진단명", type: "textarea", required: true },
+      { name: "history", label: "현병력 및 경과", type: "textarea", required: true },
+      { name: "exam", label: "검사 소견", type: "textarea" },
+      { name: "opinion", label: "소견 및 의뢰 목적", type: "textarea", required: true },
+      { name: "doctor", label: "작성의", type: "text", required: true },
+    ],
+  },
+  {
+    id: "local-admission",
+    title: "입퇴원 확인서",
+    category: "확인서",
+    description: "입원 기간 및 진단 확인",
+    fields: [
+      { name: "patient_name", label: "환자 성명", type: "text", required: true },
+      { name: "reg_no", label: "등록번호", type: "text", required: true },
+      { name: "admission_date", label: "입원일", type: "date", required: true },
+      { name: "discharge_date", label: "퇴원일", type: "date" },
+      { name: "ward", label: "병동/병실", type: "text" },
+      { name: "diagnosis", label: "진단명", type: "textarea", required: true },
+      { name: "operation", label: "시행 수술/시술", type: "textarea" },
+      { name: "doctor", label: "담당의", type: "text", required: true },
+    ],
+  },
+  {
+    id: "local-cost",
+    title: "향후 치료비 추정서",
+    category: "추정서",
+    description: "향후 치료 계획과 비용 소견",
+    fields: [
+      { name: "patient_name", label: "환자 성명", type: "text", required: true },
+      { name: "reg_no", label: "등록번호", type: "text" },
+      { name: "diagnosis", label: "진단명", type: "textarea", required: true },
+      { name: "plan", label: "향후 치료 계획", type: "textarea", required: true },
+      { name: "duration", label: "예상 치료 기간", type: "text" },
+      { name: "cost_note", label: "비용 관련 소견", type: "textarea" },
+      { name: "doctor", label: "작성의", type: "text", required: true },
+    ],
+  },
+  {
+    id: "local-opnote",
+    title: "수술 기록 요약",
+    category: "수술기록",
+    description: "수술 기록지 핵심 항목",
+    fields: [
+      { name: "patient_name", label: "환자 성명", type: "text", required: true },
+      { name: "reg_no", label: "등록번호", type: "text", required: true },
+      { name: "op_date", label: "수술일", type: "date", required: true },
+      { name: "preop_dx", label: "술전 진단", type: "textarea", required: true },
+      { name: "postop_dx", label: "술후 진단", type: "textarea" },
+      { name: "op_name", label: "수술명", type: "text", required: true },
+      { name: "surgeon", label: "집도의", type: "text", required: true },
+      { name: "assist", label: "보조의", type: "text" },
+      { name: "anesthesia", label: "마취", type: "text" },
+      { name: "findings", label: "수술 소견", type: "textarea", required: true },
+      { name: "procedure", label: "수술 과정", type: "textarea" },
+      { name: "ebl", label: "추정 실혈량(EBL)", type: "text" },
+      { name: "specimens", label: "적출 검체", type: "text" },
+    ],
+  },
+];
+
+export function parseTemplateFields(fields: unknown): TemplateField[] {
+  if (Array.isArray(fields) && fields.length > 0) {
+    return fields as TemplateField[];
+  }
+  if (typeof fields === "string") {
+    try {
+      const parsed = JSON.parse(fields) as TemplateField[];
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    } catch {
+      /* ignore */
+    }
+  }
+  return [];
+}
+
+export function resolveTemplates(rows: DocumentTemplate[]): DocumentTemplate[] {
+  const fromDb = rows
+    .map((row) => {
+      const parsed = parseTemplateFields(row.fields);
+      const fallback = FALLBACK_TEMPLATES.find((t) => t.title === row.title);
+      return {
+        ...row,
+        fields: parsed.length > 0 ? parsed : (fallback?.fields ?? []),
+      };
+    })
+    .filter((row) => row.fields.length > 0);
+  return fromDb.length > 0 ? fromDb : FALLBACK_TEMPLATES;
 }

@@ -1,4 +1,4 @@
-export type StaffRole = "스텝" | "전담간호사" | "전공의" | "인턴" | "기타";
+export type StaffRole = "스텝" | "레지던트" | "인턴" | "전담간호사";
 
 export type DutyType = "staff" | "trainee" | "nurse";
 
