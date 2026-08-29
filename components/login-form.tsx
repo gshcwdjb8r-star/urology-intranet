@@ -76,7 +76,7 @@ export function LoginForm({
               />
             </label>
             <label className="block text-sm">
-              <span className="mb-1 block font-medium">역할 (표시용)</span>
+              <span className="mb-1 block font-medium">직위</span>
               <select
                 name="role"
                 className="w-full rounded-lg border border-stone-300 bg-white px-3 py-2.5 outline-none focus:border-teal-700"
@@ -89,7 +89,7 @@ export function LoginForm({
                 ))}
               </select>
               <span className="mt-1 block text-xs text-stone-500">
-                역할은 표시용이며 순서는 스텝, 레지던트, 인턴, 전담간호사입니다. 메뉴 권한은 같습니다.
+                직위 순서는 스텝, 레지던트, 인턴, 전담간호사입니다. 메뉴 권한은 같습니다.
               </span>
             </label>
           </>

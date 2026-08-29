@@ -30,12 +30,12 @@ export default async function HomePage() {
   return (
     <div className="space-y-8">
       <header>
-        <p className="text-sm text-stone-500">{formatKoreanDate(today)}</p>
-        <h1 className="mt-1 text-2xl font-semibold text-[var(--navy)]">
+        <p className="text-2xl font-semibold text-[var(--navy)]">{formatKoreanDate(today)}</p>
+        <h1 className="mt-1 text-sm font-normal text-stone-600">
           {profile.name} 님, 안녕하세요
         </h1>
         <p className="mt-1 text-sm text-stone-600">
-          표시 역할: <span className="font-medium text-teal-800">{profile.role}</span>
+          직위: <span className="font-medium text-teal-800">{profile.role}</span>
         </p>
       </header>
 
@@ -113,6 +113,7 @@ export default async function HomePage() {
             { href: "/consents", title: "수술동의 설명", desc: "설명 체크리스트" },
             { href: "/orders", title: "입원 오더", desc: "입원·퇴원·수혈" },
             { href: "/procedures", title: "술기·수술", desc: "기본 술기 정리" },
+            { href: "/medications", title: "약품", desc: "비뇨의학과 사용 약품" },
             { href: "/terms", title: "약어·용어", desc: "Urology terminology" },
           ].map((item) => (
             <Link

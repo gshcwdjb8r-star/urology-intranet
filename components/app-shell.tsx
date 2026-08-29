@@ -112,7 +112,7 @@ export function AppShell({
         <div className="border-t border-white/10 p-4">
           <p className="truncate text-sm font-medium">{profile.name}</p>
           <form action={updateRole} className="mt-2">
-            <label className="block text-[11px] text-white/50">역할</label>
+            <label className="block text-[11px] text-white/50">직위</label>
             <select
               name="role"
               defaultValue={
