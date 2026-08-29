@@ -1,11 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { deleteTerm, updateTerm } from "@/lib/actions/knowledge";
 import type { Term } from "@/lib/types";
 
 export function TermsBrowser({ terms }: { terms: Term[] }) {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<"전체" | "약어" | "용어">("전체");
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     const n = q.trim().toLowerCase();
@@ -42,31 +44,61 @@ export function TermsBrowser({ terms }: { terms: Term[] }) {
         </div>
       </div>
       <div className="overflow-x-auto rounded-2xl border border-[var(--line)] bg-white">
-        <table className="w-full min-w-[640px] text-left text-sm">
+        <table className="w-full min-w-[720px] text-left text-sm">
           <thead className="bg-stone-50 text-stone-500">
             <tr>
               <th className="px-4 py-3 font-medium">구분</th>
               <th className="px-4 py-3 font-medium">약어 / 용어</th>
               <th className="px-4 py-3 font-medium">한글</th>
               <th className="px-4 py-3 font-medium">설명</th>
+              <th className="px-4 py-3 font-medium"> </th>
             </tr>
           </thead>
           <tbody>
             {filtered.map((t) => (
               <tr key={t.id} className="border-t border-[var(--line)] align-top">
-                <td className="px-4 py-3">
-                  <span className="rounded-full bg-teal-700/10 px-2 py-0.5 text-xs text-teal-900">
-                    {t.category}
-                  </span>
-                </td>
-                <td className="px-4 py-3">
-                  <p className="font-medium">{t.abbreviation || t.term}</p>
-                  {t.abbreviation ? (
-                    <p className="text-xs text-stone-500">{t.term}</p>
-                  ) : null}
-                </td>
-                <td className="px-4 py-3">{t.korean}</td>
-                <td className="px-4 py-3 leading-6 text-stone-700">{t.definition}</td>
+                {editingId === t.id ? (
+                  <td colSpan={5} className="px-4 py-3">
+                    <form action={updateTerm} className="grid gap-2 sm:grid-cols-2">
+                      <input type="hidden" name="id" value={t.id} />
+                      <input name="abbreviation" defaultValue={t.abbreviation ?? ""} placeholder="약어" className="rounded-lg border border-stone-300 px-3 py-2" />
+                      <input name="term" required defaultValue={t.term} placeholder="영문" className="rounded-lg border border-stone-300 px-3 py-2" />
+                      <input name="korean" defaultValue={t.korean ?? ""} placeholder="한글" className="rounded-lg border border-stone-300 px-3 py-2" />
+                      <select name="category" defaultValue={t.category} className="rounded-lg border border-stone-300 px-3 py-2">
+                        <option value="약어">약어</option>
+                        <option value="용어">용어</option>
+                      </select>
+                      <textarea name="definition" required defaultValue={t.definition} rows={3} className="rounded-lg border border-stone-300 px-3 py-2 sm:col-span-2" />
+                      <div className="flex gap-2">
+                        <button type="submit" className="rounded-lg bg-[var(--navy)] px-3 py-1.5 text-xs text-white">저장</button>
+                        <button type="button" className="text-xs text-stone-500" onClick={() => setEditingId(null)}>취소</button>
+                      </div>
+                    </form>
+                  </td>
+                ) : (
+                  <>
+                    <td className="px-4 py-3">
+                      <span className="rounded-full bg-teal-700/10 px-2 py-0.5 text-xs text-teal-900">
+                        {t.category}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      <p className="font-medium">{t.abbreviation || t.term}</p>
+                      {t.abbreviation ? (
+                        <p className="text-xs text-stone-500">{t.term}</p>
+                      ) : null}
+                    </td>
+                    <td className="px-4 py-3">{t.korean}</td>
+                    <td className="px-4 py-3 leading-6 text-stone-700">{t.definition}</td>
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <button type="button" className="mr-2 text-xs text-teal-800" onClick={() => setEditingId(t.id)}>수정</button>
+                      <form action={deleteTerm} className="inline">
+                        <input type="hidden" name="id" value={t.id} />
+                        <button type="submit" className="text-xs text-stone-400 hover:text-red-700">삭제</button>
+                      </form>
+                    </td>
+                  </>
+                )}
               </tr>
             ))}
           </tbody>

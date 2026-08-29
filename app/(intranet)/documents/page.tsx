@@ -12,13 +12,14 @@ export default async function DocumentsPage() {
   const dbSnippets: Snippet[] = (data ?? [])
     .filter((row) => isSnippetData(row.data))
     .map((row) => {
-      const d = row.data as { category: string; body: string; sourceId?: string };
+      const d = row.data as { category: string; body: string; sourceId?: string; hidden?: boolean };
       return {
         id: row.id,
         title: row.title,
         category: d.category,
         body: d.body,
         sourceId: d.sourceId,
+        hidden: d.hidden,
       };
     });
 

@@ -162,14 +162,17 @@ export function SnippetBrowser({ snippets }: { snippets: Snippet[] }) {
                       >
                         수정
                       </button>
-                      {s.builtIn ? null : (
-                        <form action={deleteSnippet}>
-                          <input type="hidden" name="id" value={s.id} />
-                          <button type="submit" className="text-xs text-stone-400 hover:text-red-700">
-                            삭제
-                          </button>
-                        </form>
-                      )}
+                      <form action={deleteSnippet}>
+                        <input type="hidden" name="id" value={s.id} />
+                        <input
+                          type="hidden"
+                          name="source_id"
+                          value={s.sourceId ?? (s.id.startsWith("default-") ? s.id : "")}
+                        />
+                        <button type="submit" className="text-xs text-stone-400 hover:text-red-700">
+                          삭제
+                        </button>
+                      </form>
                     </div>
                     {editing ? (
                       <form action={saveSnippet} className="space-y-3 border-t border-[var(--line)] px-4 py-3">

@@ -1,4 +1,4 @@
-import { createNotice, deleteNotice, toggleNoticePin } from "@/lib/actions/notices";
+import { createNotice, deleteNotice, toggleNoticePin, updateNotice } from "@/lib/actions/notices";
 import { requireUser } from "@/lib/auth";
 
 export default async function NoticesPage() {
@@ -84,6 +84,19 @@ export default async function NoticesPage() {
               </div>
             </div>
             <p className="mt-3 whitespace-pre-wrap text-sm leading-7 text-stone-700">{n.body}</p>
+            <details className="mt-4">
+              <summary className="cursor-pointer text-xs text-teal-800">수정</summary>
+              <form action={updateNotice} className="mt-3 space-y-2">
+                <input type="hidden" name="id" value={n.id} />
+                <input name="title" required defaultValue={n.title} className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm" />
+                <textarea name="body" required rows={4} defaultValue={n.body} className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm" />
+                <label className="flex items-center gap-2 text-sm">
+                  <input type="checkbox" name="pinned" defaultChecked={n.pinned} className="accent-teal-800" />
+                  상단 고정
+                </label>
+                <button type="submit" className="rounded-lg bg-[var(--navy)] px-3 py-1.5 text-xs text-white">저장</button>
+              </form>
+            </details>
           </li>
         ))}
       </ul>

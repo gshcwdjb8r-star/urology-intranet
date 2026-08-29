@@ -1,5 +1,5 @@
+import { OrdersBrowser } from "@/components/orders-browser";
 import { addOrderSet } from "@/lib/actions/knowledge";
-import { CopyButton } from "@/components/copy-button";
 import { requireUser } from "@/lib/auth";
 import type { OrderSet } from "@/lib/types";
 
@@ -7,7 +7,6 @@ export default async function OrdersPage() {
   const { supabase } = await requireUser();
   const { data } = await supabase.from("order_sets").select("*").order("sort_order");
   const orders = (data ?? []) as OrderSet[];
-  const cats = Array.from(new Set(orders.map((o) => o.category)));
 
   return (
     <div className="space-y-8">
@@ -19,29 +18,7 @@ export default async function OrdersPage() {
         </p>
       </header>
 
-      {cats.map((cat) => (
-        <section key={cat}>
-          <h2 className="mb-3 text-lg font-semibold text-[var(--navy)]">{cat}</h2>
-          <div className="space-y-4">
-            {orders
-              .filter((o) => o.category === cat)
-              .map((o) => (
-                <article
-                  key={o.id}
-                  className="rounded-2xl border border-[var(--line)] bg-white p-5"
-                >
-                  <div className="mb-3 flex items-center justify-between gap-3">
-                    <h3 className="font-medium">{o.title}</h3>
-                    <CopyButton text={o.content} />
-                  </div>
-                  <pre className="overflow-x-auto whitespace-pre-wrap font-sans text-sm leading-7 text-stone-700">
-                    {o.content}
-                  </pre>
-                </article>
-              ))}
-          </div>
-        </section>
-      ))}
+      <OrdersBrowser orders={orders} />
 
       <form action={addOrderSet} className="space-y-3 rounded-2xl border border-dashed border-stone-300 bg-white p-5">
         <h2 className="font-medium">오더셋 추가</h2>

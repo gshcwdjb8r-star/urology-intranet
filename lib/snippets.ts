@@ -5,6 +5,7 @@ export type Snippet = {
   body: string;
   sourceId?: string;
   builtIn?: boolean;
+  hidden?: boolean;
 };
 
 export const SNIPPET_CATEGORIES = ["진단서", "전원의뢰서", "기타"] as const;
@@ -18,7 +19,7 @@ export function normalizeCategory(category: string) {
 
 export function isSnippetData(
   data: unknown,
-): data is { category: string; body: string; sourceId?: string } {
+): data is { category: string; body: string; sourceId?: string; hidden?: boolean } {
   if (!data || typeof data !== "object") return false;
   const d = data as Record<string, unknown>;
   return typeof d.category === "string" && typeof d.body === "string";
@@ -122,13 +123,18 @@ export const DEFAULT_SNIPPETS: Snippet[] = [
 
 export function mergeSnippets(dbRows: Snippet[]): Snippet[] {
   const bySource = new Map<string, Snippet>();
+  const hidden = new Set<string>();
   const extras: Snippet[] = [];
   for (const row of dbRows) {
     const item = { ...row, category: normalizeCategory(row.category) };
+    if (item.hidden && item.sourceId) {
+      hidden.add(item.sourceId);
+      continue;
+    }
     if (item.sourceId) bySource.set(item.sourceId, item);
     else extras.push(item);
   }
-  const defaults = DEFAULT_SNIPPETS.map((d) => {
+  const defaults = DEFAULT_SNIPPETS.filter((d) => !hidden.has(d.id)).map((d) => {
     const override = bySource.get(d.id);
     if (!override) return d;
     return {

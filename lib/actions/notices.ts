@@ -27,6 +27,20 @@ export async function deleteNotice(formData: FormData) {
   revalidatePath("/");
 }
 
+export async function updateNotice(formData: FormData) {
+  const { supabase } = await requireUser();
+  const id = String(formData.get("id") ?? "");
+  const title = String(formData.get("title") ?? "").trim();
+  const body = String(formData.get("body") ?? "").trim();
+  if (!id || !title || !body) return;
+  await supabase
+    .from("notices")
+    .update({ title, body, pinned: formData.get("pinned") === "on" })
+    .eq("id", id);
+  revalidatePath("/notices");
+  revalidatePath("/");
+}
+
 export async function toggleNoticePin(formData: FormData) {
   const { supabase } = await requireUser();
   const id = String(formData.get("id"));

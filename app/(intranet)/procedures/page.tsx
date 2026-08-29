@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { addProcedure } from "@/lib/actions/knowledge";
+import { addProcedure, deleteProcedure } from "@/lib/actions/knowledge";
 import { requireUser } from "@/lib/auth";
 import type { Procedure } from "@/lib/types";
 
@@ -45,17 +45,25 @@ export default async function ProceduresPage({
 
       <div className="grid gap-3">
         {((data ?? []) as Procedure[]).map((p) => (
-          <Link
+          <div
             key={p.id}
-            href={`/procedures/${p.id}`}
-            className="rounded-2xl border border-[var(--line)] bg-white p-5 hover:border-teal-700/40"
+            className="flex items-start gap-3 rounded-2xl border border-[var(--line)] bg-white p-5"
           >
-            <p className="text-xs text-teal-800">{p.category}</p>
-            <h2 className="mt-1 font-semibold">{p.title}</h2>
-            {p.indication ? (
-              <p className="mt-2 text-sm text-stone-600">적응: {p.indication}</p>
-            ) : null}
-          </Link>
+            <Link href={`/procedures/${p.id}`} className="min-w-0 flex-1 hover:text-teal-800">
+              <p className="text-xs text-teal-800">{p.category}</p>
+              <h2 className="mt-1 font-semibold">{p.title}</h2>
+              {p.indication ? (
+                <p className="mt-2 text-sm text-stone-600">적응: {p.indication}</p>
+              ) : null}
+            </Link>
+            <div className="flex shrink-0 gap-2 pt-1">
+              <Link href={`/procedures/${p.id}`} className="text-xs text-teal-800">수정</Link>
+              <form action={deleteProcedure}>
+                <input type="hidden" name="id" value={p.id} />
+                <button type="submit" className="text-xs text-stone-400 hover:text-red-700">삭제</button>
+              </form>
+            </div>
+          </div>
         ))}
       </div>
 

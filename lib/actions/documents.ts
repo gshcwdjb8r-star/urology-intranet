@@ -65,9 +65,22 @@ export async function saveSnippet(formData: FormData) {
 }
 
 export async function deleteSnippet(formData: FormData) {
-  const { supabase } = await requireUser();
+  const { user, supabase } = await requireUser();
   const id = String(formData.get("id") ?? "");
-  if (!id || id.startsWith("default-")) return;
-  await supabase.from("documents").delete().eq("id", id);
+  const sourceId = String(formData.get("source_id") ?? "").trim();
+  const hideId = sourceId || (id.startsWith("default-") ? id : "");
+
+  if (id && !id.startsWith("default-")) {
+    await supabase.from("documents").delete().eq("id", id);
+  }
+
+  if (hideId.startsWith("default-")) {
+    await supabase.from("documents").insert({
+      title: "_hidden",
+      data: { category: "기타", body: "-", sourceId: hideId, hidden: true },
+      created_by: user.id,
+    });
+  }
+
   revalidatePath("/documents");
 }

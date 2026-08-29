@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { addConsentGuide } from "@/lib/actions/knowledge";
+import { addConsentGuide, deleteConsentGuide } from "@/lib/actions/knowledge";
 import { requireUser } from "@/lib/auth";
 import type { ConsentGuide } from "@/lib/types";
 
@@ -22,15 +22,25 @@ export default async function ConsentsPage() {
 
       <div className="grid gap-3 sm:grid-cols-2">
         {((data ?? []) as ConsentGuide[]).map((g) => (
-          <Link
+          <div
             key={g.id}
-            href={`/consents/${g.id}`}
-            className="rounded-2xl border border-[var(--line)] bg-white p-5 hover:border-teal-700/40"
+            className="rounded-2xl border border-[var(--line)] bg-white p-5"
           >
-            <h2 className="font-semibold">{g.surgery_name}</h2>
-            <p className="mt-2 line-clamp-2 text-sm text-stone-600">{g.summary}</p>
-            <p className="mt-3 text-xs text-stone-400">항목 {(g.items ?? []).length}개</p>
-          </Link>
+            <div className="flex items-start justify-between gap-2">
+              <Link href={`/consents/${g.id}`} className="min-w-0 flex-1 hover:text-teal-800">
+                <h2 className="font-semibold">{g.surgery_name}</h2>
+                <p className="mt-2 line-clamp-2 text-sm text-stone-600">{g.summary}</p>
+                <p className="mt-3 text-xs text-stone-400">항목 {(g.items ?? []).length}개</p>
+              </Link>
+              <div className="flex shrink-0 gap-2">
+                <Link href={`/consents/${g.id}`} className="text-xs text-teal-800">수정</Link>
+                <form action={deleteConsentGuide}>
+                  <input type="hidden" name="id" value={g.id} />
+                  <button type="submit" className="text-xs text-stone-400 hover:text-red-700">삭제</button>
+                </form>
+              </div>
+            </div>
+          </div>
         ))}
       </div>
 
