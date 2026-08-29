@@ -16,7 +16,7 @@ export const NAV_ITEMS = [
   { href: "/", label: "홈", icon: "home" },
   { href: "/duty", label: "당직표", icon: "calendar" },
   { href: "/notices", label: "공지사항", icon: "megaphone" },
-  { href: "/documents", label: "각종 문서양식", icon: "file" },
+  { href: "/documents", label: "문서 참고 문구", icon: "file" },
   { href: "/consents", label: "수술동의 설명", icon: "clipboard" },
   { href: "/terms", label: "약어·용어", icon: "book" },
   { href: "/procedures", label: "술기·수술", icon: "activity" },

@@ -3,10 +3,22 @@ export type Snippet = {
   category: string;
   title: string;
   body: string;
+  sourceId?: string;
   builtIn?: boolean;
 };
 
-export function isSnippetData(data: unknown): data is { category: string; body: string } {
+export const SNIPPET_CATEGORIES = ["진단서", "전원의뢰서", "기타"] as const;
+
+export function normalizeCategory(category: string) {
+  if (category === "소견서") return "전원의뢰서";
+  if (category === "입퇴원" || category === "수술" || category === "퇴원안내") return "기타";
+  if ((SNIPPET_CATEGORIES as readonly string[]).includes(category)) return category;
+  return "기타";
+}
+
+export function isSnippetData(
+  data: unknown,
+): data is { category: string; body: string; sourceId?: string } {
   if (!data || typeof data !== "object") return false;
   const d = data as Record<string, unknown>;
   return typeof d.category === "string" && typeof d.body === "string";
@@ -34,29 +46,29 @@ export const DEFAULT_SNIPPETS: Snippet[] = [
 용도: 직장 제출용`,
   },
   {
-    id: "default-opinion-stone",
+    id: "default-referral-stone",
     builtIn: true,
-    category: "소견서",
-    title: "요관결석 추적 의뢰",
+    category: "전원의뢰서",
+    title: "요관결석 전원",
     body: `진단명: 우측 요관결석, 경도 수신증
 현병력: 측복통으로 내원. CT상 원위 요관 결석. 발열 없음.
 검사: 소변검사 혈뇨, 신기능 확인.
-소견 및 의뢰: 통증 조절되며 자연 배출 경과 관찰 중. 발열·통증 악화 시 배액 고려. 추적 진료 부탁드립니다.`,
+의뢰 목적: 추가 시술 또는 추적 진료 부탁드립니다. 발열·통증 악화 시 배액을 고려해 주십시오.`,
   },
   {
-    id: "default-opinion-psa",
+    id: "default-referral-psa",
     builtIn: true,
-    category: "소견서",
+    category: "전원의뢰서",
     title: "PSA 상승 · 전립선암 평가",
     body: `진단명: 전립선특이항원 상승, 전립선암 의증
-현병력: PSA 상승으로 의뢰됨. 배뇨증상 (유/무), 직장수지검사 (경도/결절).
+현병력: PSA 상승으로 전원됨. 배뇨증상 (유/무), 직장수지검사 (경도/결절).
 검사: PSA, 필요 시 전립선 MRI.
-소견 및 의뢰: 조직검사 여부 평가 부탁드립니다. 항혈전제 복용 여부를 확인해 주십시오.`,
+의뢰 목적: 조직검사 여부 평가 부탁드립니다. 항혈전제 복용 여부를 확인해 주십시오.`,
   },
   {
     id: "default-adm",
     builtIn: true,
-    category: "입퇴원",
+    category: "기타",
     title: "입퇴원 확인 문구",
     body: `입원일: 
 퇴원일: 
@@ -67,7 +79,7 @@ export const DEFAULT_SNIPPETS: Snippet[] = [
   {
     id: "default-op-turbt",
     builtIn: true,
-    category: "수술",
+    category: "기타",
     title: "TURBT 기록 요약",
     body: `술전 진단: 방광종양
 술후 진단: 동일
@@ -79,7 +91,7 @@ export const DEFAULT_SNIPPETS: Snippet[] = [
   {
     id: "default-op-turp",
     builtIn: true,
-    category: "수술",
+    category: "기타",
     title: "TURP / HoLEP 기록 요약",
     body: `술전 진단: 전립선비대증
 수술명: 경요도 전립선절제술 (TURP) 또는 HoLEP
@@ -90,7 +102,7 @@ export const DEFAULT_SNIPPETS: Snippet[] = [
   {
     id: "default-dc-foley",
     builtIn: true,
-    category: "퇴원안내",
+    category: "기타",
     title: "도뇨관 · 혈뇨",
     body: `분홍빛 혈뇨는 흔합니다. 혈괴로 소변이 나오지 않거나 열이 나면 즉시 내원하십시오.
 수분을 충분히 드십시오 (심장·신장 질환이 있으면 담당의 지시를 따릅니다).
@@ -100,10 +112,34 @@ export const DEFAULT_SNIPPETS: Snippet[] = [
   {
     id: "default-dc-stent",
     builtIn: true,
-    category: "퇴원안내",
+    category: "기타",
     title: "요관스텐트 (DJ)",
     body: `옆구리 불편감, 혈뇨, 빈뇨는 스텐트가 있을 때 흔합니다.
 발열, 오한, 심한 옆구리 통증은 감염·폐색 의심이니 응급실로 오십시오.
 스텐트는 반드시 예정일에 제거 또는 교환합니다. 잊어버리면 결석·감염이 생길 수 있습니다.`,
   },
 ];
+
+export function mergeSnippets(dbRows: Snippet[]): Snippet[] {
+  const bySource = new Map<string, Snippet>();
+  const extras: Snippet[] = [];
+  for (const row of dbRows) {
+    const item = { ...row, category: normalizeCategory(row.category) };
+    if (item.sourceId) bySource.set(item.sourceId, item);
+    else extras.push(item);
+  }
+  const defaults = DEFAULT_SNIPPETS.map((d) => {
+    const override = bySource.get(d.id);
+    if (!override) return d;
+    return {
+      ...d,
+      id: override.id,
+      title: override.title,
+      body: override.body,
+      category: normalizeCategory(override.category),
+      sourceId: d.id,
+      builtIn: true,
+    };
+  });
+  return [...defaults, ...extras];
+}

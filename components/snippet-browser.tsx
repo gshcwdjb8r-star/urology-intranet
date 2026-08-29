@@ -1,20 +1,41 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { addSnippet, deleteSnippet } from "@/lib/actions/documents";
+import { addSnippet, deleteSnippet, saveSnippet } from "@/lib/actions/documents";
 import { CopyButton } from "@/components/copy-button";
-import type { Snippet } from "@/lib/snippets";
+import { SNIPPET_CATEGORIES, type Snippet } from "@/lib/snippets";
+
+function CategorySelect({
+  name,
+  defaultValue,
+}: {
+  name: string;
+  defaultValue?: string;
+}) {
+  return (
+    <select
+      name={name}
+      required
+      defaultValue={defaultValue ?? "진단서"}
+      className="w-full rounded-lg border border-stone-300 px-3 py-2"
+    >
+      {SNIPPET_CATEGORIES.map((c) => (
+        <option key={c} value={c}>
+          {c}
+        </option>
+      ))}
+    </select>
+  );
+}
 
 export function SnippetBrowser({ snippets }: { snippets: Snippet[] }) {
   const [q, setQ] = useState("");
   const [cat, setCat] = useState("전체");
   const [openId, setOpenId] = useState<string | null>(snippets[0]?.id ?? null);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
 
-  const categories = useMemo(() => {
-    const set = new Set(snippets.map((s) => s.category));
-    return ["전체", ...Array.from(set)];
-  }, [snippets]);
+  const filters = ["전체", ...SNIPPET_CATEGORIES];
 
   const filtered = useMemo(() => {
     const n = q.trim().toLowerCase();
@@ -26,13 +47,10 @@ export function SnippetBrowser({ snippets }: { snippets: Snippet[] }) {
   }, [snippets, q, cat]);
 
   const grouped = useMemo(() => {
-    const map = new Map<string, Snippet[]>();
-    for (const s of filtered) {
-      const list = map.get(s.category) ?? [];
-      list.push(s);
-      map.set(s.category, list);
-    }
-    return Array.from(map.entries());
+    return SNIPPET_CATEGORIES.map((category) => ({
+      category,
+      items: filtered.filter((s) => s.category === category),
+    })).filter((g) => g.items.length > 0);
   }, [filtered]);
 
   return (
@@ -55,7 +73,7 @@ export function SnippetBrowser({ snippets }: { snippets: Snippet[] }) {
       </div>
 
       <div className="flex flex-wrap gap-1.5">
-        {categories.map((c) => (
+        {filters.map((c) => (
           <button
             key={c}
             type="button"
@@ -74,20 +92,7 @@ export function SnippetBrowser({ snippets }: { snippets: Snippet[] }) {
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="block text-sm">
               <span className="mb-1 block text-stone-600">카테고리</span>
-              <input
-                name="category"
-                required
-                list="snippet-cats"
-                placeholder="예: 진단서, 퇴원안내"
-                className="w-full rounded-lg border border-stone-300 px-3 py-2"
-              />
-              <datalist id="snippet-cats">
-                {categories
-                  .filter((c) => c !== "전체")
-                  .map((c) => (
-                    <option key={c} value={c} />
-                  ))}
-              </datalist>
+              <CategorySelect name="category" />
             </label>
             <label className="block text-sm">
               <span className="mb-1 block text-stone-600">제목</span>
@@ -123,12 +128,13 @@ export function SnippetBrowser({ snippets }: { snippets: Snippet[] }) {
           검색 결과가 없습니다.
         </p>
       ) : (
-        grouped.map(([category, items]) => (
+        grouped.map(({ category, items }) => (
           <section key={category}>
             <h2 className="mb-2 text-sm font-semibold text-stone-500">{category}</h2>
             <div className="space-y-2">
               {items.map((s) => {
                 const open = openId === s.id;
+                const editing = editingId === s.id;
                 return (
                   <article
                     key={s.id}
@@ -138,11 +144,24 @@ export function SnippetBrowser({ snippets }: { snippets: Snippet[] }) {
                       <button
                         type="button"
                         className="min-w-0 flex-1 text-left"
-                        onClick={() => setOpenId(open ? null : s.id)}
+                        onClick={() => {
+                          setOpenId(open ? null : s.id);
+                          setEditingId(null);
+                        }}
                       >
                         <span className="font-medium">{s.title}</span>
                       </button>
                       <CopyButton text={s.body} label="복사" />
+                      <button
+                        type="button"
+                        className="text-xs text-teal-800"
+                        onClick={() => {
+                          setOpenId(s.id);
+                          setEditingId(editing ? null : s.id);
+                        }}
+                      >
+                        수정
+                      </button>
                       {s.builtIn ? null : (
                         <form action={deleteSnippet}>
                           <input type="hidden" name="id" value={s.id} />
@@ -152,7 +171,40 @@ export function SnippetBrowser({ snippets }: { snippets: Snippet[] }) {
                         </form>
                       )}
                     </div>
-                    {open ? (
+                    {editing ? (
+                      <form action={saveSnippet} className="space-y-3 border-t border-[var(--line)] px-4 py-3">
+                        <input type="hidden" name="id" value={s.id} />
+                        <input type="hidden" name="source_id" value={s.sourceId ?? (s.id.startsWith("default-") ? s.id : "")} />
+                        <div className="grid gap-3 sm:grid-cols-2">
+                          <label className="block text-sm">
+                            <span className="mb-1 block text-stone-600">카테고리</span>
+                            <CategorySelect name="category" defaultValue={s.category} />
+                          </label>
+                          <label className="block text-sm">
+                            <span className="mb-1 block text-stone-600">제목</span>
+                            <input
+                              name="title"
+                              required
+                              defaultValue={s.title}
+                              className="w-full rounded-lg border border-stone-300 px-3 py-2"
+                            />
+                          </label>
+                        </div>
+                        <textarea
+                          name="body"
+                          required
+                          rows={10}
+                          defaultValue={s.body}
+                          className="w-full rounded-lg border border-stone-300 px-3 py-2 text-sm"
+                        />
+                        <button
+                          type="submit"
+                          className="rounded-lg bg-[var(--navy)] px-4 py-2 text-sm font-medium text-white"
+                        >
+                          저장
+                        </button>
+                      </form>
+                    ) : open ? (
                       <pre className="border-t border-[var(--line)] whitespace-pre-wrap px-4 py-3 font-sans text-sm leading-7 text-stone-700">
                         {s.body}
                       </pre>
