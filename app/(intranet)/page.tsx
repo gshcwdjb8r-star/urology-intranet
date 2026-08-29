@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import Link from "next/link";
 import { DUTY_LABELS } from "@/lib/constants";
 import { requireUser } from "@/lib/auth";
