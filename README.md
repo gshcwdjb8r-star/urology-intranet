@@ -27,7 +27,7 @@ npm run dev
 | --- | --- |
 | `/` | 오늘 당직, 공지, 바로가기 |
 | `/duty` | 스텝 / 인턴·레지던트 / 전담간호사 당직 캘린더 |
-| `/documents` | 진단서 등 작성 참고 |
+| `/documents` | 문서 표준 문구 (복사) |
 | `/consents` | 수술동의 시 설명 체크리스트 |
 | `/terms` | 약어·terminology |
 | `/procedures` | 기본 술기·수술 |
