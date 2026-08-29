@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { DeleteButton } from "@/components/delete-button";
 import { addProcedure, deleteProcedure } from "@/lib/actions/knowledge";
 import { requireUser } from "@/lib/auth";
 import type { Procedure } from "@/lib/types";
@@ -58,10 +59,7 @@ export default async function ProceduresPage({
             </Link>
             <div className="flex shrink-0 gap-2 pt-1">
               <Link href={`/procedures/${p.id}`} className="text-xs text-teal-800">수정</Link>
-              <form action={deleteProcedure} className="inline">
-                <input type="hidden" name="id" value={p.id} />
-                <button type="submit" className="text-xs text-stone-400 hover:text-red-700">삭제</button>
-              </form>
+              <DeleteButton id={p.id} />
             </div>
           </div>
         ))}
