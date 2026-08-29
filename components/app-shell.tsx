@@ -80,13 +80,13 @@ export function AppShell({
   return (
     <div className="min-h-full bg-[var(--paper)]">
       <aside className="no-print fixed inset-y-0 left-0 z-30 hidden w-60 flex-col bg-[var(--navy)] text-white lg:flex">
-        <div className="border-b border-white/10 px-5 py-6">
+        <Link href="/" className="block border-b border-white/10 px-5 py-6 hover:bg-white/5 transition">
           <p className="text-[11px] tracking-[0.18em] text-teal-200/80 uppercase">
             St. Vincent&apos;s Hospital
           </p>
           <h1 className="mt-1 text-lg font-semibold leading-snug">성빈센트병원 비뇨의학과</h1>
-          <p className="mt-1 text-xs text-white/55">인트라넷</p>
-        </div>
+          <p className="mt-1 text-xs text-white/55">인트라넷 · 홈으로</p>
+        </Link>
         <nav className="flex-1 space-y-0.5 overflow-y-auto p-3">
           {NAV_ITEMS.map((item) => {
             const active =
@@ -147,10 +147,15 @@ export function AppShell({
         >
           메뉴
         </button>
-        <p className="text-sm font-semibold">성빈센트병원 비뇨의학과</p>
-        <span className="max-w-[7.5rem] truncate rounded-full bg-teal-700/10 px-2 py-0.5 text-xs text-teal-800">
-          {profile.name}
-        </span>
+        <p className="min-w-0 flex-1 truncate px-2 text-center text-sm font-semibold">성빈센트병원 비뇨의학과</p>
+        <div className="flex shrink-0 items-center gap-1.5">
+          <span className="max-w-[5rem] truncate rounded-full bg-teal-700/10 px-2 py-0.5 text-xs text-teal-800">
+            {profile.name}
+          </span>
+          <Link href="/" className="flex items-center justify-center rounded-md border border-[var(--line)] p-1.5 text-stone-600 hover:bg-stone-100" title="홈으로">
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+          </Link>
+        </div>
       </header>
 
       {open ? (
