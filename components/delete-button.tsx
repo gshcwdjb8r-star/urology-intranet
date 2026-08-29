@@ -21,6 +21,7 @@ export function DeleteButton({
     <button
       type="button"
       className={className}
+      style={{ background: "none", border: "none", padding: 0, margin: 0, font: "inherit", cursor: "pointer", lineHeight: "inherit" }}
       onClick={async () => {
         if (!confirm(message)) return;
         const fd = new FormData();
