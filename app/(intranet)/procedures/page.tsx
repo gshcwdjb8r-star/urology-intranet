@@ -27,7 +27,7 @@ export default async function ProceduresPage({
         <div className="mt-3 flex gap-2 text-sm">
           <Link
             href="/procedures"
-            className={`rounded-full px-3 py-1 ${!cat ? "bg-[var(--navy)] text-white" : "bg-white border border-[var(--line)]"}`}
+            className={`rounded-full px-3 py-1 font-medium ${!cat ? "bg-[var(--navy)] text-white!" : "bg-white border border-[var(--line)] text-stone-700"}`}
           >
             전체
           </Link>
@@ -35,7 +35,7 @@ export default async function ProceduresPage({
             <Link
               key={c}
               href={`/procedures?cat=${c}`}
-              className={`rounded-full px-3 py-1 ${cat === c ? "bg-[var(--navy)] text-white" : "bg-white border border-[var(--line)]"}`}
+              className={`rounded-full px-3 py-1 font-medium ${cat === c ? "bg-[var(--navy)] text-white!" : "bg-white border border-[var(--line)] text-stone-700"}`}
             >
               {c}
             </Link>
@@ -58,7 +58,7 @@ export default async function ProceduresPage({
             </Link>
             <div className="flex shrink-0 gap-2 pt-1">
               <Link href={`/procedures/${p.id}`} className="text-xs text-teal-800">수정</Link>
-              <form action={deleteProcedure}>
+              <form action={deleteProcedure} className="inline">
                 <input type="hidden" name="id" value={p.id} />
                 <button type="submit" className="text-xs text-stone-400 hover:text-red-700">삭제</button>
               </form>
