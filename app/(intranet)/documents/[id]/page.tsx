@@ -1,80 +1,80 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { deleteDocument } from "@/lib/actions/documents";
-import { DocumentForm } from "@/components/document-form";
+import { CopyButton } from "@/components/copy-button";
 import { PrintButton } from "@/components/print-button";
 import { requireUser } from "@/lib/auth";
-import type { DocumentTemplate, SavedDocument, TemplateField } from "@/lib/types";
+import { guideForTitle } from "@/lib/document-guides";
+import type { DocumentTemplate } from "@/lib/types";
 
-export default async function DocumentDetailPage({
+export default async function DocumentGuidePage({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
   const { supabase } = await requireUser();
-  const { data: doc } = await supabase.from("documents").select("*").eq("id", id).maybeSingle();
-  if (!doc) notFound();
-  const document = doc as SavedDocument;
-
-  let template: DocumentTemplate | null = null;
-  if (document.template_id) {
-    const { data } = await supabase
-      .from("document_templates")
-      .select("*")
-      .eq("id", document.template_id)
-      .maybeSingle();
-    template = data as DocumentTemplate | null;
-  }
-
-  const fields: TemplateField[] = template?.fields ?? [];
+  const { data } = await supabase
+    .from("document_templates")
+    .select("*")
+    .eq("id", id)
+    .maybeSingle();
+  if (!data) notFound();
+  const template = data as DocumentTemplate;
+  const extra = guideForTitle(template.title);
 
   return (
-    <div className="space-y-6">
-      <div className="no-print flex flex-wrap items-center justify-between gap-3">
+    <div className="mx-auto max-w-3xl space-y-6">
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <Link href="/documents" className="text-sm text-teal-800 hover:underline">
-            문서 목록
+            각종 문서양식
           </Link>
-          <h1 className="mt-1 text-2xl font-semibold text-[var(--navy)]">{document.title}</h1>
+          <p className="mt-2 text-xs text-teal-800">{template.category}</p>
+          <h1 className="text-2xl font-semibold text-[var(--navy)]">{template.title}</h1>
         </div>
-        <div className="flex items-center gap-3">
-          <PrintButton />
-          <form action={deleteDocument}>
-            <input type="hidden" name="id" value={document.id} />
-            <button type="submit" className="text-sm text-red-700">
-              삭제
-            </button>
-          </form>
-        </div>
+        <PrintButton />
       </div>
 
-      <article className="print-sheet rounded-2xl border border-[var(--line)] bg-white p-8">
-        <div className="print-only mb-8 text-center">
-          <p className="text-sm tracking-widest text-stone-500">성빈센트병원 비뇨의학과</p>
-          <h2 className="mt-2 text-2xl font-semibold">
-            {template?.title ?? "문서"}
-          </h2>
-        </div>
-        <dl className="space-y-4">
-          {fields.map((field) => (
-            <div key={field.name} className="grid gap-1 border-b border-dashed border-stone-200 pb-3 sm:grid-cols-[160px_1fr]">
-              <dt className="text-sm text-stone-500">{field.label}</dt>
-              <dd className="whitespace-pre-wrap text-sm leading-6">
-                {document.data?.[field.name] || "—"}
-              </dd>
-            </div>
-          ))}
-        </dl>
-        <p className="mt-10 text-right text-sm text-stone-500">
-          작성일 {new Date(document.created_at).toLocaleDateString("ko-KR")}
-        </p>
-      </article>
+      {extra ? (
+        <p className="text-sm leading-7 text-stone-600">{extra.purpose}</p>
+      ) : template.description ? (
+        <p className="text-sm leading-7 text-stone-600">{template.description}</p>
+      ) : null}
 
-      {template ? (
-        <section className="no-print mx-auto max-w-2xl rounded-2xl border border-[var(--line)] bg-white p-5">
-          <h2 className="mb-4 font-semibold">수정</h2>
-          <DocumentForm template={template} document={document} />
+      <section className="rounded-2xl border border-[var(--line)] bg-white p-5">
+        <h2 className="font-semibold">작성 시 확인할 항목</h2>
+        <ul className="mt-3 space-y-2 text-sm">
+          {(template.fields ?? []).map((field) => (
+            <li key={field.name} className="flex gap-2 border-b border-dashed border-stone-200 py-2">
+              <span className="w-40 shrink-0 text-stone-500">{field.label}</span>
+              <span className="text-stone-400">
+                {field.required ? "필수" : "해당되면 기재"}
+              </span>
+            </li>
+          ))}
+        </ul>
+      </section>
+
+      {extra?.tips?.length ? (
+        <section className="rounded-2xl border border-[var(--line)] bg-white p-5">
+          <h2 className="font-semibold">작성 요령</h2>
+          <ul className="mt-3 list-disc space-y-2 pl-5 text-sm leading-7 text-stone-700">
+            {extra.tips.map((tip) => (
+              <li key={tip}>{tip}</li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
+
+      {extra?.sample ? (
+        <section className="rounded-2xl border border-[var(--line)] bg-white p-5">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <h2 className="font-semibold">문장 예 (참고)</h2>
+            <CopyButton text={extra.sample} label="예시 복사" />
+          </div>
+          <pre className="whitespace-pre-wrap font-sans text-sm leading-7 text-stone-700">
+            {extra.sample}
+          </pre>
         </section>
       ) : null}
     </div>
