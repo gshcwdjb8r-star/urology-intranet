@@ -68,7 +68,7 @@ export function SnippetBrowser({ snippets }: { snippets: Snippet[] }) {
           onClick={() => setAdding((v) => !v)}
           className="rounded-lg border border-[var(--line)] bg-white px-3 py-2 text-sm"
         >
-          {adding ? "닫기" : "문구 추가"}
+          {adding ? "닫기" : "문서 추가"}
         </button>
       </div>
 
