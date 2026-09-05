@@ -9,9 +9,9 @@ import { formatKoreanDate, monthGrid, toDateKey } from "@/lib/utils";
 const WEEKDAYS = ["일", "월", "화", "수", "목", "금", "토"];
 const TYPE_ORDER: DutyType[] = ["staff", "trainee", "nurse"];
 const TYPE_CHIP: Record<DutyType, string> = {
-  staff: "bg-teal-700/10 text-teal-900",
+  staff: "bg-blue-700 text-white",
   trainee: "bg-amber-100 text-amber-950",
-  nurse: "bg-sky-100 text-sky-950",
+  nurse: "bg-rose-100 text-rose-950",
 };
 
 function sortShifts(list: DutyShift[]) {
