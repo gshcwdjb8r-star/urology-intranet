@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { saveOutpatientSchedule } from "@/lib/actions/outpatient-schedule";
 import type { OutpatientScheduleEntry, OutpatientSession } from "@/lib/types";
 
@@ -19,6 +22,7 @@ export function OutpatientSchedule({
 }: {
   entries: OutpatientScheduleEntry[];
 }) {
+  const [isEditing, setIsEditing] = useState(false);
   const schedule = new Map(
     entries.map((entry) => [
       `${entry.weekday}-${entry.session}`,
@@ -28,7 +32,17 @@ export function OutpatientSchedule({
 
   return (
     <section>
-      <h2 className="mb-3 text-lg font-semibold">외래 시간표</h2>
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="text-lg font-semibold">외래 시간표</h2>
+        <button
+          type="button"
+          onClick={() => setIsEditing((open) => !open)}
+          className="text-sm text-teal-800 hover:underline"
+          aria-expanded={isEditing}
+        >
+          {isEditing ? "편집 닫기" : "시간표 편집"}
+        </button>
+      </div>
 
       <div className="overflow-x-auto rounded-2xl border border-[var(--line)] bg-white">
         <table className="w-full min-w-[560px] table-fixed border-collapse">
@@ -80,11 +94,11 @@ export function OutpatientSchedule({
         </table>
       </div>
 
-      <details className="mt-3 rounded-xl border border-[var(--line)] bg-white">
-        <summary className="cursor-pointer px-4 py-3 text-sm font-medium text-teal-800">
-          시간표 편집
-        </summary>
-        <form action={saveOutpatientSchedule} className="border-t border-[var(--line)] p-4">
+      {isEditing ? (
+        <form
+          action={saveOutpatientSchedule}
+          className="mt-3 rounded-xl border border-[var(--line)] bg-white p-4"
+        >
           <p className="mb-4 text-xs text-stone-500">
             한 세션에 두 명이면 쉼표로 구분해 입력하세요.
           </p>
@@ -119,7 +133,7 @@ export function OutpatientSchedule({
             외래 시간표 저장
           </button>
         </form>
-      </details>
+      ) : null}
     </section>
   );
 }
