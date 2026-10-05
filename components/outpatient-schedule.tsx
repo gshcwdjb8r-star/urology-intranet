@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { saveOutpatientSchedule } from "@/lib/actions/outpatient-schedule";
 import type { OutpatientScheduleEntry, OutpatientSession } from "@/lib/types";
 
@@ -23,6 +23,11 @@ export function OutpatientSchedule({
   entries: OutpatientScheduleEntry[];
 }) {
   const [isEditing, setIsEditing] = useState(false);
+  const [todayWeekday, setTodayWeekday] = useState<number | null>(null);
+
+  useEffect(() => {
+    setTodayWeekday(new Date().getDay());
+  }, []);
 
   async function handleSave(formData: FormData) {
     await saveOutpatientSchedule(formData);
@@ -61,9 +66,16 @@ export function OutpatientSchedule({
               {WEEKDAYS.map((day) => (
                 <th
                   key={day.value}
-                  className="border-b border-r border-[var(--line)] px-2 py-3 text-sm font-semibold last:border-r-0"
+                  className={`border-b border-r border-[var(--line)] px-2 py-3 text-sm font-semibold last:border-r-0 ${
+                    todayWeekday === day.value ? "bg-teal-100/80 text-teal-950" : ""
+                  }`}
                 >
-                  {day.label}
+                  <span>{day.label}</span>
+                  {todayWeekday === day.value ? (
+                    <span className="ml-1.5 rounded-full bg-teal-700 px-1.5 py-0.5 text-[9px] font-medium text-white">
+                      오늘
+                    </span>
+                  ) : null}
                 </th>
               ))}
             </tr>
@@ -79,14 +91,21 @@ export function OutpatientSchedule({
                   return (
                     <td
                       key={day.value}
-                      className="border-r border-b border-[var(--line)] px-2 py-4 text-center align-middle last:border-r-0"
+                      className={`border-r border-b border-[var(--line)] px-2 py-4 text-center align-middle last:border-r-0 ${
+                        todayWeekday === day.value ? "bg-teal-50" : ""
+                      }`}
                     >
                       {names.length === 0 ? (
                         <span className="text-sm text-stone-400">미정</span>
                       ) : (
                         <div className="space-y-1">
                           {names.map((name) => (
-                            <p key={name} className="text-sm font-medium text-[var(--navy)]">
+                            <p
+                              key={name}
+                              className={`text-sm text-[var(--navy)] ${
+                                todayWeekday === day.value ? "font-semibold" : "font-medium"
+                              }`}
+                            >
                               {name}
                             </p>
                           ))}
