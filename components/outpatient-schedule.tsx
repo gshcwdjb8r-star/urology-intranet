@@ -23,6 +23,12 @@ export function OutpatientSchedule({
   entries: OutpatientScheduleEntry[];
 }) {
   const [isEditing, setIsEditing] = useState(false);
+
+  async function handleSave(formData: FormData) {
+    await saveOutpatientSchedule(formData);
+    setIsEditing(false);
+  }
+
   const schedule = new Map(
     entries.map((entry) => [
       `${entry.weekday}-${entry.session}`,
@@ -96,7 +102,7 @@ export function OutpatientSchedule({
 
       {isEditing ? (
         <form
-          action={saveOutpatientSchedule}
+          action={handleSave}
           className="mt-3 rounded-xl border border-[var(--line)] bg-white p-4"
         >
           <p className="mb-4 text-xs text-stone-500">
