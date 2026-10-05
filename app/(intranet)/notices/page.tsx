@@ -8,6 +8,7 @@ export default async function NoticesPage() {
   const { data } = await supabase
     .from("notices")
     .select("*, profiles(name)")
+    .neq("title", "__OUTPATIENT_SCHEDULE__")
     .order("pinned", { ascending: false })
     .order("created_at", { ascending: false });
 
