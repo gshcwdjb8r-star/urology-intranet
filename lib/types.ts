@@ -2,6 +2,17 @@ export type StaffRole = "스텝" | "레지던트" | "인턴" | "전담간호사"
 
 export type DutyType = "staff" | "trainee" | "nurse" | "outpatient_nurse";
 
+export type OutpatientSession = "am" | "pm";
+
+export type OutpatientScheduleEntry = {
+  id: string;
+  weekday: number;
+  session: OutpatientSession;
+  doctor_names: string[];
+  updated_by: string | null;
+  updated_at: string;
+};
+
 export type Profile = {
   id: string;
   name: string;
