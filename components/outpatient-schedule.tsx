@@ -44,7 +44,7 @@ export function OutpatientSchedule({
           type="button"
           onClick={() => setIsEditing((open) => !open)}
           className="font-normal text-stone-600 hover:text-stone-900 hover:underline"
-          style={{ fontSize: "13px", lineHeight: "18px", WebkitTextSizeAdjust: "none" }}
+          style={{ fontSize: "14px", lineHeight: "20px", WebkitTextSizeAdjust: "none" }}
           aria-expanded={isEditing}
         >
           {isEditing ? "편집 닫기" : "시간표 편집"}
