@@ -2,20 +2,26 @@ export const dynamic = "force-dynamic";
 
 import Link from "next/link";
 import { DUTY_LABELS } from "@/lib/constants";
+import { OutpatientSchedule } from "@/components/outpatient-schedule";
 import { requireUser } from "@/lib/auth";
 import { formatKoreanDate, toDateKey } from "@/lib/utils";
-import type { DutyShift, Notice } from "@/lib/types";
+import type { DutyShift, Notice, OutpatientScheduleEntry } from "@/lib/types";
 
 export default async function HomePage() {
   const { supabase, profile } = await requireUser();
   const today = toDateKey(new Date());
 
-  const [{ data: duties }, { data: notices }] = await Promise.all([
+  const [{ data: duties }, { data: outpatientSchedule }, { data: notices }] = await Promise.all([
     supabase
       .from("duty_shifts")
       .select("*")
       .eq("duty_date", today)
       .order("duty_type"),
+    supabase
+      .from("outpatient_schedule")
+      .select("*")
+      .order("weekday")
+      .order("session"),
     supabase
       .from("notices")
       .select("*, profiles(name)")
@@ -24,7 +30,12 @@ export default async function HomePage() {
       .limit(5),
   ]);
 
-  const grouped: Record<string, DutyShift[]> = { staff: [], trainee: [], nurse: [] };
+  const grouped: Record<string, DutyShift[]> = {
+    staff: [],
+    trainee: [],
+    nurse: [],
+    outpatient_nurse: [],
+  };
   for (const d of (duties ?? []) as DutyShift[]) {
     grouped[d.duty_type]?.push(d);
   }
@@ -49,7 +60,7 @@ export default async function HomePage() {
           </Link>
         </div>
         <div className="divide-y divide-[var(--line)] rounded-2xl border border-[var(--line)] bg-white">
-          {(["staff", "trainee", "nurse"] as const).map((key) => (
+          {(["staff", "trainee", "nurse", "outpatient_nurse"] as const).map((key) => (
             <div
               key={key}
               className="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-baseline sm:gap-4"
@@ -75,6 +86,10 @@ export default async function HomePage() {
           ))}
         </div>
       </section>
+
+      <OutpatientSchedule
+        entries={(outpatientSchedule ?? []) as OutpatientScheduleEntry[]}
+      />
 
       <section>
         <div className="mb-3 flex items-center justify-between">
