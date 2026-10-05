@@ -1,6 +1,6 @@
 export type StaffRole = "스텝" | "레지던트" | "인턴" | "전담간호사" | "외래간호사";
 
-export type DutyType = "staff" | "trainee" | "nurse" | "outpatient_nurse";
+export type DutyType = "staff" | "trainee" | "nurse";
 
 export type OutpatientSession = "am" | "pm";
 
