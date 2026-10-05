@@ -11,20 +11,21 @@ export default async function HomePage() {
   const { supabase, profile } = await requireUser();
   const today = toDateKey(new Date());
 
-  const [{ data: duties }, { data: outpatientSchedule }, { data: notices }] = await Promise.all([
+  const [{ data: duties }, { data: scheduleNotice }, { data: notices }] = await Promise.all([
     supabase
       .from("duty_shifts")
       .select("*")
       .eq("duty_date", today)
       .order("duty_type"),
     supabase
-      .from("outpatient_schedule")
-      .select("*")
-      .order("weekday")
-      .order("session"),
+      .from("notices")
+      .select("body")
+      .eq("title", "__OUTPATIENT_SCHEDULE__")
+      .maybeSingle(),
     supabase
       .from("notices")
       .select("*, profiles(name)")
+      .neq("title", "__OUTPATIENT_SCHEDULE__")
       .order("pinned", { ascending: false })
       .order("created_at", { ascending: false })
       .limit(5),
@@ -34,10 +35,17 @@ export default async function HomePage() {
     staff: [],
     trainee: [],
     nurse: [],
-    outpatient_nurse: [],
   };
   for (const d of (duties ?? []) as DutyShift[]) {
     grouped[d.duty_type]?.push(d);
+  }
+
+  let outpatientSchedule: OutpatientScheduleEntry[] = [];
+  try {
+    const parsed = JSON.parse(scheduleNotice?.body ?? "[]");
+    if (Array.isArray(parsed)) outpatientSchedule = parsed;
+  } catch {
+    outpatientSchedule = [];
   }
 
   return (
@@ -60,7 +68,7 @@ export default async function HomePage() {
           </Link>
         </div>
         <div className="divide-y divide-[var(--line)] rounded-2xl border border-[var(--line)] bg-white">
-          {(["staff", "trainee", "nurse", "outpatient_nurse"] as const).map((key) => (
+          {(["staff", "trainee", "nurse"] as const).map((key) => (
             <div
               key={key}
               className="flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-baseline sm:gap-4"
@@ -88,7 +96,7 @@ export default async function HomePage() {
       </section>
 
       <OutpatientSchedule
-        entries={(outpatientSchedule ?? []) as OutpatientScheduleEntry[]}
+        entries={outpatientSchedule}
       />
 
       <section>
