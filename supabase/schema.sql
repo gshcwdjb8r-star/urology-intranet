@@ -24,6 +24,16 @@ create table if not exists public.duty_shifts (
 create index if not exists duty_shifts_date_type_idx
   on public.duty_shifts (duty_date, duty_type);
 
+create table if not exists public.outpatient_schedule (
+  id uuid primary key default gen_random_uuid(),
+  weekday smallint not null check (weekday between 1 and 5),
+  session text not null check (session in ('am', 'pm')),
+  doctor_names text[] not null default '{}',
+  updated_by uuid references public.profiles (id) on delete set null,
+  updated_at timestamptz not null default now(),
+  unique (weekday, session)
+);
+
 create table if not exists public.document_templates (
   id uuid primary key default gen_random_uuid(),
   title text not null,
@@ -127,6 +137,7 @@ create trigger on_auth_user_created
 
 alter table public.profiles enable row level security;
 alter table public.duty_shifts enable row level security;
+alter table public.outpatient_schedule enable row level security;
 alter table public.document_templates enable row level security;
 alter table public.documents enable row level security;
 alter table public.consent_guides enable row level security;
@@ -145,6 +156,10 @@ create policy "profiles_update_own" on public.profiles
 
 drop policy if exists "duty_all" on public.duty_shifts;
 create policy "duty_all" on public.duty_shifts
+  for all to authenticated using (true) with check (true);
+
+drop policy if exists "outpatient_schedule_all" on public.outpatient_schedule;
+create policy "outpatient_schedule_all" on public.outpatient_schedule
   for all to authenticated using (true) with check (true);
 
 drop policy if exists "templates_select" on public.document_templates;
