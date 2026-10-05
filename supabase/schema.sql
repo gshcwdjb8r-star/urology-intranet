@@ -13,7 +13,7 @@ create table if not exists public.profiles (
 
 create table if not exists public.duty_shifts (
   id uuid primary key default gen_random_uuid(),
-  duty_type text not null check (duty_type in ('staff', 'trainee', 'nurse')),
+  duty_type text not null check (duty_type in ('staff', 'trainee', 'nurse', 'outpatient_nurse')),
   duty_date date not null,
   person_name text not null,
   note text,
