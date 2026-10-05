@@ -1,16 +1,18 @@
-export const DUTY_LABELS: Record<"staff" | "trainee" | "nurse", string> = {
+export const DUTY_LABELS: Record<"staff" | "trainee" | "nurse" | "outpatient_nurse", string> = {
   staff: "스텝 당직",
   trainee: "인턴·레지던트 당직",
   nurse: "전담간호사 당직",
+  outpatient_nurse: "외래간호사 당직",
 };
 
-export const DUTY_SHORT: Record<"staff" | "trainee" | "nurse", string> = {
+export const DUTY_SHORT: Record<"staff" | "trainee" | "nurse" | "outpatient_nurse", string> = {
   staff: "스텝",
   trainee: "전공의/인턴",
   nurse: "전담간호사",
+  outpatient_nurse: "외래간호사",
 };
 
-export const ROLES = ["스텝", "레지던트", "인턴", "전담간호사"] as const;
+export const ROLES = ["스텝", "레지던트", "인턴", "전담간호사", "외래간호사"] as const;
 
 export const NAV_ITEMS = [
   { href: "/", label: "홈", icon: "home" },
